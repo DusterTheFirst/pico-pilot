@@ -16,4 +16,9 @@ pico_enable_stdio_uart(pilot 1) # Enable UART Output
 
 pico_add_extra_outputs(pilot)
 
-target_link_libraries(pilot pico_stdlib hardware_pwm)
+target_link_libraries(
+    pilot
+    pico_stdlib
+    hardware_pwm
+    pico_multicore
+)
