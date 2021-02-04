@@ -1,10 +1,4 @@
-#include "hardware/clocks.h"
-#include "hardware/gpio.h"
-#include "hardware/pwm.h"
-#include "pico/binary_info.h"
-#include "pico/multicore.h"
-#include "pico/stdlib.h"
-#include <stdio.h>
+#include "main.h"
 
 const uint LED_PIN = 25;
 
@@ -19,8 +13,6 @@ bi_decl(bi_program_description("Avionics system based on the Raspberry Pi Pico/R
 bi_decl(bi_1pin_with_name(LED_PIN, "On-board LED"));
 bi_decl(bi_2pins_with_names(TVC_X_AXIS_PWM, "TVC X-Axis", TVC_Z_AXIS_PWM, "TVC Z-Axis"));
 bi_decl(bi_2pins_with_func(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM, GPIO_FUNC_PWM));
-
-void core1_entry();
 
 int main() {
     stdio_init_all();
@@ -69,11 +61,19 @@ int main() {
 
     // printf("Servo absolute extents (%u <- %u -> %u)\n", min, center, max);
 
-    // // Center Servos
-    pwm_set_gpio_level(TVC_X_AXIS_PWM, 2500);
-    pwm_set_gpio_level(TVC_Z_AXIS_PWM, 2500);
+    volatile uint16_t pos = 4750;
 
-    // gpio_put(SERVO_POWER_EN_PIN, 1);
+    const uint16_t LEFT = 7550;   // 2.40ms   -90*
+    const uint16_t CENTER = 4850; // 1.55ms     0*
+    const uint16_t RIGHT = 2250;  // 0.70ms    90*
+
+    while (true) {
+        // Center Servos
+        pwm_set_gpio_level(TVC_X_AXIS_PWM, pos);
+        pwm_set_gpio_level(TVC_Z_AXIS_PWM, pos);
+
+        gpio_put(SERVO_POWER_EN_PIN, 1);
+    }
 
     //     // Calibration
     //     puts("Sweeping X axis");
