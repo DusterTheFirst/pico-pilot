@@ -12,7 +12,7 @@ pico_sdk_init()
 # Add the headers
 include_directories(include)
 
-# Get all of the c files in the src directory
+# Add all the files to compile
 file(GLOB SOURCES src/*.c) # replace .c with .cpp for a cpp project
 add_executable(pico_pilot
     ${SOURCES}

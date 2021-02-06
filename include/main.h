@@ -6,6 +6,7 @@
 #include "pico/binary_info.h"
 #include "pico/multicore.h"
 #include "pico/stdlib.h"
+#include "tvc.h"
 #include <stdio.h>
 
 void core1_entry();

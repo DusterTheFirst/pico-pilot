@@ -6,8 +6,6 @@ const uint SERVO_POWER_EN_PIN = 16;
 const uint TVC_X_AXIS_PWM = 18;
 const uint TVC_Z_AXIS_PWM = 19;
 
-const uint TVC_PWM_MAX = 62500;
-
 // Metadata
 bi_decl(bi_program_description("Avionics system based on the Raspberry Pi Pico/RP2040 platform "));
 bi_decl(bi_1pin_with_name(LED_PIN, "On-board LED"));
@@ -26,15 +24,11 @@ int main() {
     gpio_set_dir(SERVO_POWER_EN_PIN, GPIO_OUT);
     gpio_put(SERVO_POWER_EN_PIN, 0);
 
-    pwm_config cfg = pwm_get_default_config();
-    pwm_config_set_wrap(&cfg, TVC_PWM_MAX);
-    pwm_config_set_clkdiv_int(&cfg, 40); // Set 50hz
-    pwm_init(pwm_gpio_to_slice_num(TVC_X_AXIS_PWM), &cfg, true);
-
-    gpio_set_function(TVC_X_AXIS_PWM, GPIO_FUNC_PWM);
-    gpio_set_function(TVC_Z_AXIS_PWM, GPIO_FUNC_PWM);
-
     multicore_launch_core1(core1_entry);
+
+    tvc_servo_pair tvc = init_tvc(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM);
+
+    gpio_put(SERVO_POWER_EN_PIN, 1);
 
     // uint32_t pwm_clock_freq = clock_get_hz(clk_sys) / PWM_CLOCK_DIV;
     // double clock_period_ms = 1000.0 / (double)pwm_clock_freq;
@@ -61,18 +55,32 @@ int main() {
 
     // printf("Servo absolute extents (%u <- %u -> %u)\n", min, center, max);
 
-    volatile uint16_t pos = 4750;
-
-    const uint16_t LEFT = 7550;   // 2.40ms   -90*
+    const uint16_t RIGHT = 7500;  // 2.40ms    90* CW
     const uint16_t CENTER = 4850; // 1.55ms     0*
-    const uint16_t RIGHT = 2250;  // 0.70ms    90*
+    const uint16_t LEFT = 2200;   // 0.70ms    90* CCW
+
+    const uint16_t RIGHT10 = (uint16_t)(((double)(RIGHT - CENTER) / 90.0) * 10.0) + CENTER;
+    const uint16_t LEFT10 = CENTER - (uint16_t)(((double)(CENTER - LEFT) / 90.0) * 10.0);
+
+    uint16_t pos = CENTER;
+    int16_t direction = 1;
 
     while (true) {
-        // Center Servos
-        pwm_set_gpio_level(TVC_X_AXIS_PWM, pos);
-        pwm_set_gpio_level(TVC_Z_AXIS_PWM, pos);
+        tvc_put(&tvc, 0.0, 0.0);
+        // pwm_set_gpio_level(TVC_X_AXIS_PWM, pos);
+        // pwm_set_gpio_level(TVC_Z_AXIS_PWM, pos);
 
-        gpio_put(SERVO_POWER_EN_PIN, 1);
+        // pos += direction;
+
+        // if (pos <= LEFT10) {
+        //     direction = 1;
+        //     puts("Direction +");
+        // } else if (pos >= RIGHT10) {
+        //     direction = -1;
+        //     puts("Direction -");
+        // }
+
+        // sleep_ms(1);
     }
 
     //     // Calibration
