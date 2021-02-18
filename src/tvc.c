@@ -51,11 +51,11 @@ void tvc_put(tvc_servo_pair *tvc, double x, double z) {
     panic_assert(x >= -90.0 && x <= 90.0, "Only control signals from -90 to +90 degrees are supported on the x axis");
     panic_assert(z >= -90.0 && z <= 90.0, "Only control signals from -90 to +90 degrees are supported on the z axis");
 
-    pwm_set_chan_level(tvc->slice, tvc->x_channel, degrees_to_level(x));
-    pwm_set_chan_level(tvc->slice, tvc->z_channel, degrees_to_level(z));
+    pwm_set_chan_level(tvc->slice, tvc->x_channel, degrees_to_level(x * X_ARM_RATIO));
+    pwm_set_chan_level(tvc->slice, tvc->z_channel, degrees_to_level(z * Z_ARM_RATIO));
 }
 
-static uint16_t degrees_to_level(double deg) {
+static uint16_t degrees_to_servo_command(double deg) {
     if (deg > 0) {
         return (uint16_t)(((double)(CW90 - CENTER) / 90.0) * deg) + CENTER;
     } else {

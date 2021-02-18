@@ -65,8 +65,10 @@ int main() {
     uint16_t pos = CENTER;
     int16_t direction = 1;
 
+    volatile float position = 0.0;
+
     while (true) {
-        tvc_put(&tvc, 0.0, 0.0);
+        tvc_put(&tvc, position, position);
         // pwm_set_gpio_level(TVC_X_AXIS_PWM, pos);
         // pwm_set_gpio_level(TVC_Z_AXIS_PWM, pos);
 
