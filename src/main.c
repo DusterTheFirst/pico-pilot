@@ -12,23 +12,29 @@ bi_decl(bi_1pin_with_name(LED_PIN, "On-board LED"));
 bi_decl(bi_2pins_with_names(TVC_X_AXIS_PWM, "TVC X-Axis", TVC_Z_AXIS_PWM, "TVC Z-Axis"));
 bi_decl(bi_2pins_with_func(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM, GPIO_FUNC_PWM));
 
+tvc_servo_pair tvc;
+
+void __attribute__((constructor)) initial_state() {
+    gpio_init(LED_PIN);
+    gpio_set_dir(LED_PIN, GPIO_OUT);
+
+    gpio_put(LED_PIN, 0);
+
+    tvc = init_tvc(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM);
+    // ...
+}
+
 int main() {
     stdio_init_all();
     printf("\e[1;1H\e[2J");
 
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
-    gpio_put(LED_PIN, 0);
-
-    gpio_init(SERVO_POWER_EN_PIN);
-    gpio_set_dir(SERVO_POWER_EN_PIN, GPIO_OUT);
-    gpio_put(SERVO_POWER_EN_PIN, 0);
-
     multicore_launch_core1(core1_entry);
 
-    tvc_servo_pair tvc = init_tvc(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM);
+    // gpio_init(SERVO_POWER_EN_PIN);
+    // gpio_set_dir(SERVO_POWER_EN_PIN, GPIO_OUT);
+    // gpio_put(SERVO_POWER_EN_PIN, 0); // FIXME: Unended?
 
-    gpio_put(SERVO_POWER_EN_PIN, 1);
+    // gpio_put(SERVO_POWER_EN_PIN, 1); // TODO: REMOVE?
 
     // uint32_t pwm_clock_freq = clock_get_hz(clk_sys) / PWM_CLOCK_DIV;
     // double clock_period_ms = 1000.0 / (double)pwm_clock_freq;
