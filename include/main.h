@@ -9,5 +9,6 @@
 #include "pico/stdlib.h"
 #include "tvc.h"
 #include <stdio.h>
+#include <math.h>
 
 void core1_entry();

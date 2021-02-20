@@ -60,12 +60,10 @@ int main() {
 
     tvc_put(&tvc, 0.0, 0.0);
 
-#define PI 3.14159265358979323846 // TODO: REMOVE
+    double sin = 0.0;
+    double cos = 0.0;
 
-    for (double angle = 0; angle < 2 * PI; angle += PI / 500.0) {
-        double sin;
-        double cos;
-
+    for (double angle = 0; angle < 2 * M_PI; angle += M_PI / 500.0) {
         printf("T: 0,0,%f\n", angle);
         sincos(angle, &sin, &cos);
 
