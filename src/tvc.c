@@ -1,9 +1,5 @@
 #include "tvc.h"
 
-const uint16_t NEG90 = 7500; // 2.40ms   -90*
-const uint16_t ZERO = 4850;  // 1.55ms     0*
-const uint16_t POS90 = 2200; // 0.70ms    90*
-
 const uint16_t CW90 = 7500;   // 2.40ms   90* CW
 const uint16_t CENTER = 4850; // 1.55ms    0*
 const uint16_t CCW90 = 2200;  // 0.70ms   90* CCW
@@ -11,6 +7,7 @@ const uint16_t CCW90 = 2200;  // 0.70ms   90* CCW
 const uint TVC_PWM_MAX = 62500;
 const uint TVC_CLKDIV = 40;
 
+// TODO: ADD OUT OF RANGE DETECTION TO PREVENT BREAKAGE
 /*
  * Initialize the given pins for servo TVC
  */
@@ -35,8 +32,8 @@ tvc_servo_pair init_tvc(uint x, uint z) {
     pwm_init(pwm_slice, &cfg, true);
 
     // Center Servos
-    pwm_set_chan_level(tvc.slice, tvc.x_channel, ZERO);
-    pwm_set_chan_level(tvc.slice, tvc.z_channel, ZERO);
+    pwm_set_chan_level(tvc.slice, tvc.x_channel, CENTER);
+    pwm_set_chan_level(tvc.slice, tvc.z_channel, CENTER);
 
     return tvc;
 }
@@ -50,6 +47,8 @@ tvc_servo_pair init_tvc(uint x, uint z) {
 void tvc_put(tvc_servo_pair *tvc, double x, double z) {
     panic_assert(x >= -90.0 && x <= 90.0, "Only control signals from -90 to +90 degrees are supported on the x axis");
     panic_assert(z >= -90.0 && z <= 90.0, "Only control signals from -90 to +90 degrees are supported on the z axis");
+
+    printf("T: %f,%f,0\n", x, z); // TODO: BETTER LOGGING (Maybe arduino-plotters?)
 
     pwm_set_chan_level(tvc->slice, tvc->x_channel, degrees_to_servo_command(x * X_ARM_RATIO));
     pwm_set_chan_level(tvc->slice, tvc->z_channel, degrees_to_servo_command(z * Z_ARM_RATIO));

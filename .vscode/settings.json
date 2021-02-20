@@ -21,5 +21,6 @@
     },
     "cmake.saveBeforeBuild": true,
     "cmake.buildBeforeRun": true,
+    "cmake.clearOutputBeforeBuild": true,
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
 }
