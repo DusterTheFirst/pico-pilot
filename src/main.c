@@ -3,8 +3,8 @@
 const uint LED_PIN = 25;
 
 const uint SERVO_POWER_EN_PIN = 16;
-const uint TVC_X_AXIS_PWM = 18;
-const uint TVC_Z_AXIS_PWM = 19;
+const uint TVC_X_AXIS_PWM = 21;
+const uint TVC_Z_AXIS_PWM = 20;
 
 // Metadata
 bi_decl(bi_program_description("Avionics system based on the Raspberry Pi Pico/RP2040 platform "));
@@ -46,38 +46,35 @@ int main() {
 
     puts("Sweeping X axis");
 
-    for (double x = -5.0; x < 5.0; x += 0.1) {
+    for (double x = -5.0; x < 5.0; x += 0.5) {
         tvc_put(&tvc, x, 0.0);
         sleep_ms(50);
     }
 
     puts("Sweeping Z axis");
 
-    for (double z = -5.0; z < 5.0; z += 0.1) {
+    for (double z = -5.0; z < 5.0; z += 0.5) {
         tvc_put(&tvc, 0.0, z);
         sleep_ms(50);
     }
 
     tvc_put(&tvc, 0.0, 0.0);
 
-    double sin = 0.0;
-    double cos = 0.0;
+    for (int i = 0; i < 100; i++)
+        for (double angle = 0; angle < 2 * M_PI; angle += M_PI / 25.0) {
+            printf("T: 0,0,%f\n", angle);
 
-    for (double angle = 0; angle < 2 * M_PI; angle += M_PI / 500.0) {
-        printf("T: 0,0,%f\n", angle);
-        sincos(angle, &sin, &cos);
-
-        tvc_put(&tvc, sin * 5.0, cos * 5.0);
-        sleep_ms(50);
-    }
+            tvc_put(&tvc, sin(angle) * 5.0, cos(angle) * 5.0);
+            sleep_ms(50);
+        }
 
     tvc_put(&tvc, 0.0, 0.0);
 
     puts("Done");
 
     while (true) {
-        __wfi();
         tvc_put(&tvc, 0.0, 0.0);
+        __wfi();
     }
 }
 
