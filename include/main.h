@@ -8,7 +8,7 @@
 #include "pico/multicore.h"
 #include "pico/stdlib.h"
 #include "tvc.h"
+#include "telemetry.h"
+#include "pins.h"
 #include <stdio.h>
 #include <math.h>
-
-void core1_entry();

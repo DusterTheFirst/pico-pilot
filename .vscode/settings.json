@@ -21,6 +21,11 @@
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
-        "*.h": "c"
+        "*.sxcu": "json",
+        "**/.cargo/config": "toml",
+        "*.h": "c",
+        "type_traits": "c",
+        "cstdio": "c"
     },
+    "C_Cpp.errorSquiggles": "Disabled",
 }

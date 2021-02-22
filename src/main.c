@@ -1,17 +1,5 @@
 #include "main.h"
 
-const uint LED_PIN = 25;
-
-const uint SERVO_POWER_EN_PIN = 16;
-const uint TVC_X_AXIS_PWM = 21;
-const uint TVC_Z_AXIS_PWM = 20;
-
-// Metadata
-bi_decl(bi_program_description("Avionics system based on the Raspberry Pi Pico/RP2040 platform "));
-bi_decl(bi_1pin_with_name(LED_PIN, "On-board LED"));
-bi_decl(bi_2pins_with_names(TVC_X_AXIS_PWM, "TVC X-Axis", TVC_Z_AXIS_PWM, "TVC Z-Axis"));
-bi_decl(bi_2pins_with_func(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM, GPIO_FUNC_PWM));
-
 tvc_servo_pair tvc;
 
 void __attribute__((constructor)) initial_state() {
@@ -28,7 +16,7 @@ void __attribute__((constructor)) initial_state() {
 }
 
 int main() {
-    multicore_launch_core1(core1_entry);
+    multicore_launch_core1(telemetry_main);
 
     // Calibration
     tvc_put(&tvc, -5.0, 0.0);
@@ -75,15 +63,5 @@ int main() {
     while (true) {
         tvc_put(&tvc, 0.0, 0.0);
         __wfi();
-    }
-}
-
-void core1_entry() {
-    while (true) {
-        gpio_put(LED_PIN, 0);
-        sleep_ms(250);
-        gpio_put(LED_PIN, 1);
-
-        sleep_ms(500);
     }
 }

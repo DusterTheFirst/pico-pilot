@@ -7,3 +7,4 @@ NamespaceIndentation: All
 BreakBeforeBraces: Attach
 IndentCaseLabels: true
 FixNamespaceComments: false
+AlignOperands: true
