@@ -9,10 +9,10 @@
 
 void telemetry_main();
 
-static inline void telemetry_push_blocking(const double *d) {
-    const uint64_t * bytes = d;
+static inline void telemetry_push_blocking(const double d) {
+    const uint64_t *bytes = (uint64_t *)&d;
     const uint32_t high_bytes = *bytes;
-    const uint32_t low_bytes = bytes[4];
+    const uint32_t low_bytes = *(bytes + sizeof(uint32_t));
 
     multicore_fifo_push_blocking(high_bytes);
     multicore_fifo_push_blocking(low_bytes);

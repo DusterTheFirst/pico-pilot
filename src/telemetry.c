@@ -14,19 +14,25 @@ void telemetry_main() {
             if (fifo_in == 0) {
                 // Flush the telemetry buffer out and send it
                 values_in = 0;
-                puts("\n");
+                puts("");
             } else {
-                const uint32_t high_bytes = fifo_in;
+                uint64_t bytes = (uint64_t)fifo_in << 32;
+
                 const uint32_t low_bytes = multicore_fifo_pop_blocking();
-                const uint64_t bytes = high_bytes << 32 & low_bytes;
-                const double value = *(double *)(&bytes);
+                bytes &= low_bytes;
+
+                // const double value = *(double *)(&bytes);
 
                 // Push the value out to the telemetry
+                char * prefix;
                 if (values_in > 0) {
-                    puts(",");
+                    prefix = ",";
+                } else {
+                    prefix = "TELEM: ";
                 }
 
-                printf("%f", value);
+                printf("%s%p", prefix, &bytes);
+                values_in ++;
             }
         }
     }

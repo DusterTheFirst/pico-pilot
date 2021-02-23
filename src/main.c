@@ -25,23 +25,27 @@ int main() {
     multicore_launch_core1(telemetry_main);
 
     // Calibration
-    tvc_put(&tvc, -5.0, 0.0);
-    sleep_ms(300);
-    tvc_put(&tvc, 5.0, 0.0);
-    sleep_ms(300);
-    tvc_put(&tvc, 0.0, 0.0);
-    sleep_ms(300);
-    tvc_put(&tvc, 0.0, -5.0);
-    sleep_ms(300);
-    tvc_put(&tvc, 0.0, 5.0);
-    sleep_ms(300);
-    tvc_put(&tvc, 0.0, 0.0);
-    sleep_ms(300);
+    const double calibration_moves[6][2] = {
+        {-5.0, 0.0},
+        {-5.0, 0.0},
+        {0.0, 0.0},
+        {0.0, -5.0},
+        {0.0, 5.0},
+        {0.0, 0.0}};
+
+    for (int i = 0; i < sizeof(calibration_moves) / sizeof(double[2]); i++) {
+        const double *move = calibration_moves[i];
+
+        tvc_put(&tvc, move[0], move[1]);
+        telemetry_finish_blocking();
+        sleep_ms(300);
+    }
 
     puts("Sweeping X axis");
 
     for (double x = -5.0; x < 5.0; x += 0.5) {
         tvc_put(&tvc, x, 0.0);
+        telemetry_finish_blocking();
         sleep_ms(50);
     }
 
@@ -49,6 +53,7 @@ int main() {
 
     for (double z = -5.0; z < 5.0; z += 0.5) {
         tvc_put(&tvc, 0.0, z);
+        telemetry_finish_blocking();
         sleep_ms(50);
     }
 
@@ -56,18 +61,21 @@ int main() {
 
     for (int i = 0; i < 100; i++)
         for (double angle = 0; angle < 2 * M_PI; angle += M_PI / 25.0) {
-            printf("T: 0,0,%f\n", angle);
-
             tvc_put(&tvc, sin(angle) * 5.0, cos(angle) * 5.0);
+            telemetry_push_blocking(angle);
+            telemetry_finish_blocking();
+
             sleep_ms(50);
         }
 
     tvc_put(&tvc, 0.0, 0.0);
+    telemetry_finish_blocking();
 
     puts("Done");
 
     while (true) {
         tvc_put(&tvc, 0.0, 0.0);
+        telemetry_finish_blocking();
         __wfi();
     }
 }
