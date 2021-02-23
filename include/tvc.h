@@ -3,6 +3,7 @@
 #include "hardware/pwm.h"
 #include "pico/stdlib.h"
 #include "panic_assert.h"
+#include "telemetry.h"
 #include <stdio.h>
 #include <math.h>
 
