@@ -24,6 +24,7 @@
         "*.sxcu": "json",
         "**/.cargo/config": "toml",
         "*.h": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "condition_variable": "c"
     },
 }

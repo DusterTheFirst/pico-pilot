@@ -49,8 +49,7 @@ void tvc_put(tvc_servo_pair *tvc, double x, double z) {
     panic_assert(z >= -90.0 && z <= 90.0, "Only control signals from -90 to +90 degrees are supported on the z axis");
 
     // printf("T: %f,%f,0\n", x, z); // TODO: BETTER LOGGING (Maybe arduino-plotters?)
-    telemetry_push_blocking(x);
-    telemetry_push_blocking(z);
+    telemetry_push_tvc_command(x, z);
 
     pwm_set_chan_level(tvc->slice, tvc->x_channel, degrees_to_servo_command(x * X_ARM_RATIO));
     pwm_set_chan_level(tvc->slice, tvc->z_channel, degrees_to_servo_command(z * Z_ARM_RATIO));

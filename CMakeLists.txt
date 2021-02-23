@@ -29,5 +29,7 @@ pico_add_extra_outputs(pico_pilot)
 target_link_libraries(pico_pilot
     pico_stdlib
     hardware_pwm
+    hardware_adc
+    hardware_dma
     pico_multicore
 )

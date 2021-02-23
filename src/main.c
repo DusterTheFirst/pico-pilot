@@ -9,6 +9,11 @@ bi_decl(bi_2pins_with_func(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM, GPIO_FUNC_PWM));
 tvc_servo_pair tvc;
 
 void __attribute__((constructor)) initial_state() {
+    adc_init();
+    adc_select_input(4);
+    adc_set_round_robin(0b11000);
+    adc_set_temp_sensor_enabled(true);
+
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
 
@@ -37,7 +42,6 @@ int main() {
         const double *move = calibration_moves[i];
 
         tvc_put(&tvc, move[0], move[1]);
-        telemetry_finish_blocking();
         sleep_ms(300);
     }
 
@@ -45,7 +49,6 @@ int main() {
 
     for (double x = -5.0; x < 5.0; x += 0.5) {
         tvc_put(&tvc, x, 0.0);
-        telemetry_finish_blocking();
         sleep_ms(50);
     }
 
@@ -53,7 +56,6 @@ int main() {
 
     for (double z = -5.0; z < 5.0; z += 0.5) {
         tvc_put(&tvc, 0.0, z);
-        telemetry_finish_blocking();
         sleep_ms(50);
     }
 
@@ -62,20 +64,17 @@ int main() {
     for (int i = 0; i < 100; i++)
         for (double angle = 0; angle < 2 * M_PI; angle += M_PI / 25.0) {
             tvc_put(&tvc, sin(angle) * 5.0, cos(angle) * 5.0);
-            telemetry_push_blocking(angle);
-            telemetry_finish_blocking();
+            telemetry_push_tvc_angle_request(angle);
 
             sleep_ms(50);
         }
 
     tvc_put(&tvc, 0.0, 0.0);
-    telemetry_finish_blocking();
 
     puts("Done");
 
     while (true) {
         tvc_put(&tvc, 0.0, 0.0);
-        telemetry_finish_blocking();
         __wfi();
     }
 }
