@@ -61,9 +61,12 @@ int main() {
 
     tvc_put(&tvc, 0.0, 0.0);
 
+    double sin, cos;
     for (int i = 0; i < 100; i++)
         for (double angle = 0; angle < 2 * M_PI; angle += M_PI / 25.0) {
-            tvc_put(&tvc, sin(angle) * 5.0, cos(angle) * 5.0);
+            sincos(angle, &sin, &cos);
+
+            tvc_put(&tvc, sin * 5.0, cos * 5.0);
             telemetry_push_tvc_angle_request(angle);
 
             sleep_ms(50);
