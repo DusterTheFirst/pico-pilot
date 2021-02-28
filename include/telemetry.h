@@ -12,13 +12,26 @@
 #include <stdlib.h>
 
 typedef enum {
+    LOGGING_IDLE = 5,
+    LOGGING_LOW = 50,
+    LOGGING_MED = 100,
+    LOGGING_HIGH = 200,
+} logging_frequency_t;
+
+typedef enum {
     TVCCommand,
     TVCAngleRequest
 } telemetry_command_type_t;
 
 typedef struct {
     telemetry_command_type_t type;
-    double *data;
+    union {
+        struct {
+            double x;
+            double z;
+        } tvc_command;
+        double tvc_angle_request;
+    };
 } telemetry_command_t;
 
 typedef struct {
@@ -42,7 +55,9 @@ static inline void telemetry_push_blocking(telemetry_command_t command) {
 static inline void telemetry_push_tvc_command(double x, double z) {
     telemetry_command_t command = {
         .type = TVCCommand,
-        .data = (double[]){x, z}};
+        .tvc_command = {
+            .x = x,
+            .z = z}};
 
     telemetry_push_blocking(command);
 }
@@ -50,7 +65,7 @@ static inline void telemetry_push_tvc_command(double x, double z) {
 static inline void telemetry_push_tvc_angle_request(double angle) {
     telemetry_command_t command = {
         .type = TVCAngleRequest,
-        .data = (double[]){angle}};
+        .tvc_angle_request = angle};
 
     telemetry_push_blocking(command);
 }

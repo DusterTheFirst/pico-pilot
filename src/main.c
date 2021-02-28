@@ -22,7 +22,11 @@ void __attribute__((constructor)) initial_state() {
     tvc = init_tvc(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM);
 
     stdio_init_all();
-    printf("\e[1;1H\e[2J");
+
+    for (int i = 0; i < 10; i++)
+        printf("\n");
+    printf("\e[1;1H\e[2J"); // Clear the screen
+
     puts("Initial state setup.");
 }
 

@@ -1,7 +1,7 @@
 #include "telemetry.h"
 
 // The logging frequency, in hertz
-const int LOGGING_FREQ = 100;
+const logging_frequency_t LOGGING_FREQ = LOGGING_HIGH; // TODO: ADD DYNAMIC LOG FREQ
 
 queue_t telemetry_queue;
 
@@ -22,7 +22,7 @@ void telemetry_main() {
     queue_init(&telemetry_queue, sizeof(telemetry_command_t), LOGGING_FREQ);
 
     // negative timeout means exact delay (rather than delay between callbacks)
-    if (add_repeating_timer_us(-1000000 / LOGGING_FREQ, telemetry_push, NULL, &telemetry_push_timer)) {
+    if (!add_repeating_timer_us(-1000000 / LOGGING_FREQ, telemetry_push, NULL, &telemetry_push_timer)) {
         printf("Failed to add telemetry push timer\n");
         return;
     }
@@ -35,11 +35,11 @@ void telemetry_main() {
             mutex_enter_blocking(&cache_mutex);
             switch (command.type) {
                 case TVCCommand:
-                    cache.tvc_x = command.data[0];
-                    cache.tvc_z = command.data[1];
+                    cache.tvc_x = command.tvc_command.x;
+                    cache.tvc_z = command.tvc_command.z;
                     break;
                 case TVCAngleRequest:
-                    cache.angle = command.data[0];
+                    cache.angle = command.tvc_angle_request;
                     break;
             }
             mutex_exit(&cache_mutex);
@@ -51,22 +51,22 @@ static bool telemetry_push(repeating_timer_t *rt) {
     static cached_telemetry_data_t cache_copy;
 
     mutex_enter_blocking(&cache_mutex);
-    memcpy(&cache, &cache_copy, sizeof(cached_telemetry_data_t));
+    memcpy(&cache_copy, (const cached_telemetry_data_t*) &cache, sizeof(cached_telemetry_data_t));
     mutex_exit(&cache_mutex);
 
     // Shadow the global cache so that the mutex is held for as little time as possible
     // and the code does not try to access the global cache
-    const cached_telemetry_data_t *cache = &cache_copy;
+    const cached_telemetry_data_t cache = cache_copy;
 
-    uint16_t raw_temperature_voltage = adc_read();
-    uint16_t raw_battery_voltage = adc_read();
+    // uint16_t raw_temperature_voltage = adc_read();
+    // uint16_t raw_battery_voltage = adc_read();
 
     // from 4.9.4 of rp2040 datasheet
-    double temperature = 27.0 - ((double)raw_temperature_voltage - 0.706) / 0.001721;
+    double temperature = 0.0; // 27.0 - ((double)raw_temperature_voltage - 0.706) / 0.001721;
 
-    double battery = (double)raw_battery_voltage; // FIXME:
+    double battery = 0.0; // (double)raw_battery_voltage; // FIXME:
 
-    printf("TELEM: %f,%f,%f,%f,%f\n", cache->tvc_x, cache->tvc_z, cache->angle, temperature, battery);
+    printf("TELEM: %f,%f,%f,%f,%f\n", cache.tvc_x, cache.tvc_z, cache.angle, temperature, battery);
 
     return true;
 }

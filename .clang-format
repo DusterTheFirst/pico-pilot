@@ -1,4 +1,4 @@
-Standard: Cpp11
+Standard: Latest
 BasedOnStyle: LLVM
 IndentWidth: 4
 ColumnLimit: 0
@@ -8,3 +8,4 @@ BreakBeforeBraces: Attach
 IndentCaseLabels: true
 FixNamespaceComments: false
 AlignOperands: true
+Cpp11BracedListStyle: true
