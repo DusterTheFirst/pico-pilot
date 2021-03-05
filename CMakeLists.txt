@@ -11,11 +11,13 @@ pico_sdk_init()
 
 # Add the headers
 include_directories(include)
+include_directories(deps/**)
 
 # Add all the files to compile
 file(GLOB SOURCES src/*.c) # replace .c with .cpp for a cpp project
 add_executable(pico_pilot
     ${SOURCES}
+    deps/BNO055_driver/bno055.c
 )
 
 # Setup the compile time SDK options
