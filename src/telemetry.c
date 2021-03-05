@@ -51,20 +51,21 @@ static bool telemetry_push(repeating_timer_t *rt) {
     static cached_telemetry_data_t cache_copy;
 
     mutex_enter_blocking(&cache_mutex);
-    memcpy(&cache_copy, (const cached_telemetry_data_t*) &cache, sizeof(cached_telemetry_data_t));
+    memcpy(&cache_copy, (const cached_telemetry_data_t *)&cache, sizeof(cached_telemetry_data_t));
     mutex_exit(&cache_mutex);
 
     // Shadow the global cache so that the mutex is held for as little time as possible
     // and the code does not try to access the global cache
     const cached_telemetry_data_t cache = cache_copy;
 
-    // uint16_t raw_temperature_voltage = adc_read();
-    // uint16_t raw_battery_voltage = adc_read();
+    const double conversion_factor = 3.3f / (1 << 12);
+    uint16_t raw_temperature_voltage = adc_read(); // TODO: FILTER
+    uint16_t raw_battery_voltage = adc_read();
 
     // from 4.9.4 of rp2040 datasheet
-    double temperature = 0.0; // 27.0 - ((double)raw_temperature_voltage - 0.706) / 0.001721;
+    double temperature = 27.0 - (((double)raw_temperature_voltage * conversion_factor) - 0.706) / 0.001721;
 
-    double battery = 0.0; // (double)raw_battery_voltage; // FIXME:
+    double battery = (double)raw_battery_voltage * conversion_factor; // FIXME:
 
     printf("TELEM: %f,%f,%f,%f,%f\n", cache.tvc_x, cache.tvc_z, cache.angle, temperature, battery);
 
