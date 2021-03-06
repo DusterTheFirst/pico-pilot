@@ -1,11 +1,11 @@
 #pragma once
 
 #include "hardware/pwm.h"
-#include "pico/stdlib.h"
 #include "panic_assert.h"
+#include "pico/stdlib.h"
 #include "telemetry.h"
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 
 #define X_SERVO_ARM 8.6 // mm
 #define Z_SERVO_ARM 8.6 // mm
@@ -15,8 +15,8 @@
 
 // These ratios are only usable in the approximately linear range of the
 // push rod joint
-// These represent the scalar to scale the inputted motor degrees to degrees to command
-// the servo
+// These represent the scalar to scale the inputted motor degrees to degrees to
+// command the servo
 #define X_ARM_RATIO X_MOTOR_ARM / X_SERVO_ARM
 #define Z_ARM_RATIO Z_MOTOR_ARM / Z_SERVO_ARM
 

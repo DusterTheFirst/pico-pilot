@@ -1,4 +1,5 @@
 #include "tvc.h"
+#include "banned.h"
 
 const uint16_t CW90 = 7500;   // 2.40ms   90* CW
 const uint16_t CENTER = 4850; // 1.55ms    0*
@@ -13,8 +14,10 @@ const uint TVC_CLKDIV = 40;
  */
 tvc_servo_pair init_tvc(uint x, uint z) {
     // Ensure the servos are separate channels but the same slice
-    panic_assert(pwm_gpio_to_slice_num(x) == pwm_gpio_to_slice_num(z), "TVC servo pins must be on the same pwm slice");
-    panic_assert(pwm_gpio_to_channel(x) != pwm_gpio_to_channel(z), "TVC servo pins must be on different pwm channels");
+    panic_assert(pwm_gpio_to_slice_num(x) == pwm_gpio_to_slice_num(z),
+                 "TVC servo pins must be on the same pwm slice");
+    panic_assert(pwm_gpio_to_channel(x) != pwm_gpio_to_channel(z),
+                 "TVC servo pins must be on different pwm channels");
 
     tvc_servo_pair tvc = {
         .slice = pwm_gpio_to_slice_num(x),
@@ -45,20 +48,29 @@ tvc_servo_pair init_tvc(uint x, uint z) {
  * neg is counter clockwise
  */
 void tvc_put(tvc_servo_pair *tvc, double x, double z) {
-    panic_assert(x >= -90.0 && x <= 90.0, "Only control signals from -90 to +90 degrees are supported on the x axis");
-    panic_assert(z >= -90.0 && z <= 90.0, "Only control signals from -90 to +90 degrees are supported on the z axis");
+    panic_assert(x >= -90.0 && x <= 90.0,
+                 "X AXIS ERR: "
+                 "Only control signals from -90 to +90 degrees are supported");
+    panic_assert(z >= -90.0 && z <= 90.0,
+                 "Z AXIS ERR: "
+                 "Only control signals from -90 to +90 degrees are supported");
 
-    // printf("T: %f,%f,0\n", x, z); // TODO: BETTER LOGGING (Maybe arduino-plotters?)
     telemetry_push_tvc_command(x, z);
 
-    pwm_set_chan_level(tvc->slice, tvc->x_channel, degrees_to_servo_command(x * X_ARM_RATIO));
-    pwm_set_chan_level(tvc->slice, tvc->z_channel, degrees_to_servo_command(z * Z_ARM_RATIO));
+    pwm_set_chan_level(tvc->slice,
+                       tvc->x_channel,
+                       degrees_to_servo_command(x * X_ARM_RATIO));
+
+    pwm_set_chan_level(tvc->slice,
+                       tvc->z_channel,
+                       degrees_to_servo_command(z * Z_ARM_RATIO));
 }
 
 static uint16_t degrees_to_servo_command(double deg) {
     if (deg > 0) {
         return (uint16_t)(((double)(CW90 - CENTER) / 90.0) * deg) + CENTER;
     } else {
-        return CENTER - (uint16_t)(((double)(CENTER - CCW90) / 90.0) * fabs(deg));
+        return CENTER -
+               (uint16_t)(((double)(CENTER - CCW90) / 90.0) * fabs(deg));
     }
 }

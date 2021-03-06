@@ -1,9 +1,12 @@
 #include "main.h"
+#include "banned.h"
 
 // Metadata
-bi_decl(bi_program_description("Avionics system based on the Raspberry Pi Pico/RP2040 platform "));
+bi_decl(bi_program_description(
+    "Avionics system based on the Raspberry Pi Pico/RP2040 platform "));
 bi_decl(bi_1pin_with_name(LED_PIN, "On-board LED"));
-bi_decl(bi_2pins_with_names(TVC_X_AXIS_PWM, "TVC X-Axis", TVC_Z_AXIS_PWM, "TVC Z-Axis"));
+bi_decl(bi_2pins_with_names(TVC_X_AXIS_PWM, "TVC X-Axis",
+                            TVC_Z_AXIS_PWM, "TVC Z-Axis"));
 bi_decl(bi_2pins_with_func(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM, GPIO_FUNC_PWM));
 
 tvc_servo_pair tvc;
@@ -30,8 +33,26 @@ void __attribute__((constructor)) initial_state() {
     puts("Initial state setup.");
 }
 
+polled_telemetry_data_t poll_voltages() {
+    const double conversion_factor = 3.3f / (1 << 12);
+
+    // TODO: FILTER
+    double raw_temperature_voltage = (double)adc_read() * conversion_factor;
+    double raw_battery_voltage = (double)adc_read() * conversion_factor;
+
+    // from 4.9.4 of rp2040 datasheet
+    double temperature = 27.0 - ((raw_temperature_voltage)-0.706) / 0.001721;
+
+    double battery = raw_battery_voltage; // FIXME:
+
+    return ((polled_telemetry_data_t){
+        .temperature = temperature,
+        .battery_voltage = battery});
+}
+
 int main() {
     multicore_launch_core1(telemetry_main);
+    telemetry_register_poll_callback(poll_voltages);
 
     // Calibration
     const double calibration_moves[6][2] = {

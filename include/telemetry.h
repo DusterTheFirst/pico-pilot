@@ -40,9 +40,15 @@ typedef struct {
     double angle;
     // uint16_t raw_temperature_voltage;
     // uint16_t raw_battery_voltage;
-} cached_telemetry_data_t;
+} pushed_telemetry_data_t;
+
+typedef struct {
+    double temperature;
+    double battery_voltage;
+} polled_telemetry_data_t;
 
 extern queue_t telemetry_queue;
+extern polled_telemetry_data_t (*telemetry_poll_callback)();
 
 void telemetry_main();
 
@@ -68,4 +74,9 @@ static inline void telemetry_push_tvc_angle_request(double angle) {
         .tvc_angle_request = angle};
 
     telemetry_push_blocking(command);
+}
+
+static inline void telemetry_register_poll_callback(
+    polled_telemetry_data_t (*callback)()) {
+    telemetry_poll_callback = callback;
 }

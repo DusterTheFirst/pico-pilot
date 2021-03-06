@@ -25,4 +25,7 @@
         "**/.cargo/config": "toml",
         "*.h": "c",
     },
+    "cSpell.words": [
+        "NOLINT"
+    ],
 }
