@@ -1,5 +1,6 @@
 #pragma once
 
+#include "filtering.h"
 #include "hardware/adc.h"
 #include "hardware/clocks.h"
 #include "hardware/gpio.h"

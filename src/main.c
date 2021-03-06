@@ -33,6 +33,14 @@ void __attribute__((constructor)) initial_state() {
     puts("Initial state setup.");
 }
 
+exp_rolling_avg_t poll_temperature;
+exp_rolling_avg_t poll_battery_voltage;
+
+void __attribute__((constructor)) init_averages() {
+    poll_temperature = exp_rolling_avg_init(0.6);
+    poll_battery_voltage = exp_rolling_avg_init(0.6);
+}
+
 polled_telemetry_data_t poll_voltages() {
     const double conversion_factor = 3.3f / (1 << 12);
 
@@ -41,13 +49,14 @@ polled_telemetry_data_t poll_voltages() {
     double raw_battery_voltage = (double)adc_read() * conversion_factor;
 
     // from 4.9.4 of rp2040 datasheet
-    double temperature = 27.0 - ((raw_temperature_voltage)-0.706) / 0.001721;
+    exp_rolling_avg_push(&poll_temperature,
+                         27.0 - ((raw_temperature_voltage)-0.706) / 0.001721);
 
-    double battery = raw_battery_voltage; // FIXME:
+    exp_rolling_avg_push(&poll_battery_voltage, raw_battery_voltage); // FIXME:
 
     return ((polled_telemetry_data_t){
-        .temperature = temperature,
-        .battery_voltage = battery});
+        .temperature = poll_temperature.value,
+        .battery_voltage = poll_battery_voltage.value});
 }
 
 int main() {

@@ -1,6 +1,8 @@
 #pragma once
 
+#include "pico/stdlib.h"
 #include <stdarg.h>
+#include <stdio.h>
 
 #define panic_assert(cond, message, ...)                        \
     if (!(cond)) {                                              \
