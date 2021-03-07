@@ -1,5 +1,7 @@
 #pragma once
 
+#define _GNU_SOURCE
+
 #include "filtering.h"
 #include "hardware/adc.h"
 #include "hardware/clocks.h"

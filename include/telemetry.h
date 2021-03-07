@@ -44,6 +44,7 @@ typedef struct {
 
 typedef struct {
     double temperature;
+    double system_voltage;
     double battery_voltage;
 } polled_telemetry_data_t;
 

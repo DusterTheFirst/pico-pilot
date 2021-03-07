@@ -66,11 +66,12 @@ static bool telemetry_push(repeating_timer_t *rt) {
     // possible and the code does not try to access the global cache
     const pushed_telemetry_data_t cache = cache_copy;
 
-    printf("TELEM: %f,%f,%f,%f,%f\n",
+    printf("TELEM: %f,%f,%f,%f,%f,%f\n",
            cache.tvc_x,
            cache.tvc_z,
            cache.angle,
            polled.temperature,
+           polled.system_voltage,
            polled.battery_voltage);
 
     return true;
