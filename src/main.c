@@ -44,8 +44,8 @@ exp_rolling_avg_t poll_battery_voltage;
 
 void __attribute__((constructor)) init_averages() {
     poll_temperature = exp_rolling_avg_init(.9);
-    poll_system_voltage = exp_rolling_avg_init(.4);
-    poll_battery_voltage = exp_rolling_avg_init(.4);
+    poll_system_voltage = exp_rolling_avg_init(.6);
+    poll_battery_voltage = exp_rolling_avg_init(.6);
 }
 
 polled_telemetry_data_t poll_voltages() {

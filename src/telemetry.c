@@ -12,8 +12,6 @@ pushed_telemetry_data_t cache = {
     .tvc_x = 0.0,
     .tvc_x = 0.0,
     .angle = 0.0,
-    // .raw_temperature_voltage = 0,
-    // .raw_battery_voltage = 0.0
 };
 polled_telemetry_data_t (*telemetry_poll_callback)() = NULL;
 
