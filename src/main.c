@@ -10,7 +10,6 @@ bi_decl(bi_2pins_with_names(TVC_X_AXIS_PWM, "TVC X-Axis",
 bi_decl(bi_2pins_with_func(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM, GPIO_FUNC_PWM));
 bi_decl(bi_2pins_with_func(V_SYS_ADC_PIN, V_BAT_ADC_PIN, GPIO_FUNC_NULL));
 
-
 exp_rolling_avg_t poll_temperature;
 exp_rolling_avg_t poll_system_voltage;
 exp_rolling_avg_t poll_battery_voltage;

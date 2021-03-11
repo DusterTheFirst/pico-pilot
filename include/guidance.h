@@ -1,5 +1,7 @@
 #pragma once
 
+#define _GNU_SOURCE
+
 #include "pico/double.h"
 #include "pins.h"
 #include "tvc.h"
