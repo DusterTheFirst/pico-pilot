@@ -17,10 +17,14 @@ polled_telemetry_data_t (*telemetry_poll_callback)() = NULL;
 
 uint32_t values_in = 0;
 
+void __attribute__((constructor)) telemetry_init() {
+    queue_init(&telemetry_queue, sizeof(telemetry_command_t), 128);
+
+    puts("Initial telemetry state setup.");
+}
+
 void telemetry_main() {
     repeating_timer_t telemetry_push_timer;
-
-    queue_init(&telemetry_queue, sizeof(telemetry_command_t), LOGGING_FREQ);
 
     // negative timeout means exact delay (rather than delay between callbacks)
     if (!add_repeating_timer_us(-1000000 / LOGGING_FREQ,

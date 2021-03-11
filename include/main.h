@@ -3,6 +3,7 @@
 #define _GNU_SOURCE
 
 #include "filtering.h"
+#include "guidance.h"
 #include "hardware/adc.h"
 #include "hardware/clocks.h"
 #include "hardware/gpio.h"

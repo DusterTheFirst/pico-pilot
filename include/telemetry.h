@@ -51,6 +51,7 @@ typedef struct {
 extern queue_t telemetry_queue;
 extern polled_telemetry_data_t (*telemetry_poll_callback)();
 
+void telemetry_init();
 void telemetry_main();
 
 static bool telemetry_push(repeating_timer_t *rt);
