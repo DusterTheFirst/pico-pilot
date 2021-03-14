@@ -20,9 +20,11 @@ add_executable(pico_pilot
     deps/BNO055_driver/bno055.c
 )
 
+pico_wrap_function(pico_pilot panic)
+
 # Setup the compile time SDK options
 pico_enable_stdio_usb(pico_pilot 1)  # Enable USB Output
-pico_enable_stdio_uart(pico_pilot 1) # Enable UART Output
+pico_enable_stdio_uart(pico_pilot 0) # Disable UART Output
 
 # Build the .uf2 and other files
 pico_add_extra_outputs(pico_pilot)

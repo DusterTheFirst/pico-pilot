@@ -1,4 +1,10 @@
 #include "tvc.h"
+#include "hardware/pwm.h"
+#include "panic_assert.h"
+#include "telemetry.h"
+#include <math.h>
+#include <stdio.h>
+
 #include "banned.h"
 
 const uint16_t CW90 = 7500;   // 2.40ms   90* CW

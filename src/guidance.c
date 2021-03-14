@@ -1,4 +1,14 @@
+#define _GNU_SOURCE
+
 #include "guidance.h"
+#include "constants.h"
+#include "pico/double.h"
+#include "telemetry.h"
+#include "tvc.h"
+#include <math.h>
+#include <stdio.h>
+
+#include "banned.h"
 
 tvc_servo_pair tvc;
 

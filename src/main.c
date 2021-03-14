@@ -1,4 +1,19 @@
-#include "main.h"
+#include "constants.h"
+#include "filtering.h"
+#include "guidance.h"
+#include "hardware/adc.h"
+#include "hardware/clocks.h"
+#include "hardware/gpio.h"
+#include "hardware/pwm.h"
+#include "pico/binary_info.h"
+#include "pico/double.h"
+#include "pico/multicore.h"
+#include "pico/stdlib.h"
+#include "telemetry.h"
+#include "tvc.h"
+#include <math.h>
+#include <stdio.h>
+
 #include "banned.h"
 
 // Metadata
@@ -62,6 +77,10 @@ int main() {
     gpio_put(LED_PIN, 0);
 
     stdio_init_all();
+
+    // Baud rate debugging
+    volatile uint target_baud = TARGET_BAUD;
+    volatile uint actual_baud = uart_set_baudrate(uart0, TARGET_BAUD);
 
     telemetry_init();
     guidance_init();

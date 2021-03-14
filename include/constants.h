@@ -18,3 +18,5 @@ static const uint V_SYS_ADC_PIN = 29;
 static const uint V_BAT_ADC_PIN = 28;
 
 static const double V_BAT_CONV_FACTOR = voltage_divider_factor(220000, 100000);
+
+static const uint TARGET_BAUD = /* 7812500 */ 115200;

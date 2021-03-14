@@ -1,11 +1,6 @@
 #pragma once
 
-#include "hardware/pwm.h"
-#include "panic_assert.h"
 #include "pico/stdlib.h"
-#include "telemetry.h"
-#include <math.h>
-#include <stdio.h>
 
 #define X_SERVO_ARM 8.6 // mm
 #define Z_SERVO_ARM 8.6 // mm

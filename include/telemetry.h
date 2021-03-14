@@ -1,21 +1,15 @@
 #pragma once
 
-#include "hardware/adc.h"
-#include "hardware/clocks.h"
-#include "hardware/dma.h"
-#include "pico/multicore.h"
-#include "pico/stdlib.h"
 #include "pico/util/queue.h"
-#include "pins.h"
-#include <memory.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdbool.h>
 
 typedef enum {
     LOGGING_IDLE = 5,
-    LOGGING_LOW = 50,
-    LOGGING_MED = 100,
-    LOGGING_HIGH = 200,
+    LOGGING_SLOW = 50,
+    LOGGING_NORMAL = 100,
+    LOGGING_FAST = 200,
+    LOGGING_ULTRA_FAST = 500,
+    LOGGING_STUPID_FAST = 1000,
 } logging_frequency_t;
 
 typedef enum {
@@ -54,7 +48,7 @@ extern polled_telemetry_data_t (*telemetry_poll_callback)();
 void telemetry_init();
 void telemetry_main();
 
-static bool telemetry_push(repeating_timer_t *rt);
+static bool telemetry_push();
 
 static inline void telemetry_push_blocking(telemetry_command_t command) {
     queue_add_blocking(&telemetry_queue, &command);

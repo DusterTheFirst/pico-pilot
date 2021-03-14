@@ -1,13 +1,22 @@
 #include "telemetry.h"
+#include "constants.h"
+#include "hardware/adc.h"
+#include "hardware/clocks.h"
+#include "hardware/dma.h"
+#include "pico/multicore.h"
+#include "pico/stdlib.h"
+#include <memory.h>
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "banned.h"
 
 // TODO: ADD DYNAMIC LOG FREQ
 // The logging frequency, in hertz
-const logging_frequency_t LOGGING_FREQ = LOGGING_HIGH;
+const logging_frequency_t LOGGING_FREQ = LOGGING_STUPID_FAST;
 
 queue_t telemetry_queue;
 
-auto_init_mutex(cache_mutex);
 pushed_telemetry_data_t cache = {
     .tvc_x = 0.0,
     .tvc_x = 0.0,
@@ -17,30 +26,20 @@ polled_telemetry_data_t (*telemetry_poll_callback)() = NULL;
 
 uint32_t values_in = 0;
 
-void __attribute__((constructor)) telemetry_init() {
+void telemetry_init() {
     queue_init(&telemetry_queue, sizeof(telemetry_command_t), 128);
 
     puts("Initial telemetry state setup.");
 }
 
+absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(next_telemetry_push, 0);
+
 void telemetry_main() {
-    repeating_timer_t telemetry_push_timer;
-
-    // negative timeout means exact delay (rather than delay between callbacks)
-    if (!add_repeating_timer_us(-1000000 / LOGGING_FREQ,
-                                telemetry_push,
-                                NULL,
-                                &telemetry_push_timer)) {
-        printf("Failed to add telemetry push timer\n");
-        return;
-    }
-
     telemetry_command_t command;
     while (true) {
-        gpio_put(LED_PIN, 0);
+        gpio_xor_mask(1 << LED_PIN);
 
         while (queue_try_remove(&telemetry_queue, &command)) {
-            mutex_enter_blocking(&cache_mutex);
             switch (command.type) {
                 case TVCCommand:
                     cache.tvc_x = command.tvc_command.x;
@@ -50,25 +49,24 @@ void telemetry_main() {
                     cache.angle = command.tvc_angle_request;
                     break;
             }
-            mutex_exit(&cache_mutex);
+        }
+
+        bool time_is_passed = absolute_time_diff_us(next_telemetry_push,
+                                                    get_absolute_time()) <= 0;
+
+        if (is_nil_time(next_telemetry_push) || time_is_passed) {
+            telemetry_push();
+
+            next_telemetry_push = make_timeout_time_ms(-1000000 / LOGGING_FREQ);
         }
     }
 }
 
-static bool telemetry_push(repeating_timer_t *rt) {
+static bool telemetry_push() {
     polled_telemetry_data_t polled = telemetry_poll_callback();
 
-    static pushed_telemetry_data_t cache_copy;
-
-    mutex_enter_blocking(&cache_mutex);
-    memcpy(&cache_copy, &cache, sizeof(pushed_telemetry_data_t));
-    mutex_exit(&cache_mutex);
-
-    // Shadow the global cache so that the mutex is held for as little time as
-    // possible and the code does not try to access the global cache
-    const pushed_telemetry_data_t cache = cache_copy;
-
-    printf("TELEM: %f,%f,%f,%f,%f,%f\n",
+    printf("TELEM: %f,%f,%f,%f,%f,%f,%f\n",
+           (double)to_us_since_boot(get_absolute_time()) / 1000000,
            cache.tvc_x,
            cache.tvc_z,
            cache.angle,
