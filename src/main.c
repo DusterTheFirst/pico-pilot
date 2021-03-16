@@ -76,7 +76,7 @@ int main() {
 
     gpio_put(LED_PIN, 0);
 
-    stdio_init_all();
+    stdio_init_all(); // FIXME: INITIALIZE STDIO FIRST?
 
     // Baud rate debugging
     volatile uint target_baud = TARGET_BAUD;
@@ -84,6 +84,19 @@ int main() {
 
     telemetry_init();
     guidance_init();
+
+    const uint32_t start_command = 0xDEADBEEF;
+
+    uint32_t shift_in = 0;
+    while (shift_in != start_command) {
+        volatile int eof = EOF;
+        volatile int incoming = getchar();
+
+        if (incoming != EOF) {
+            shift_in = shift_in << 8 | (incoming & 0xFF);
+        }
+        // shift_in <<= incoming & 0xFF;
+    }
 
     multicore_launch_core1(guidance_main);
     telemetry_register_poll_callback(poll_voltages);
