@@ -31,8 +31,8 @@ exp_rolling_avg_t poll_battery_voltage;
 
 void __attribute__((constructor)) init_averages() {
     poll_temperature = exp_rolling_avg_init(.9);
-    poll_system_voltage = exp_rolling_avg_init(.6);
-    poll_battery_voltage = exp_rolling_avg_init(.6);
+    poll_system_voltage = exp_rolling_avg_init(.8);
+    poll_battery_voltage = exp_rolling_avg_init(.8);
 }
 
 polled_telemetry_data_t poll_voltages() {
@@ -62,7 +62,11 @@ polled_telemetry_data_t poll_voltages() {
 }
 
 int main() {
-    adc_init();
+    stdio_init_all(); // FIXME: Serial port not open on first breakpoint
+
+
+    adc_init(); // FIXME: analog readings heavily dependant on VSys
+                // (better calibration? use VRef?)
 
     adc_gpio_init(V_SYS_ADC_PIN);
     adc_gpio_init(V_BAT_ADC_PIN);
@@ -76,27 +80,12 @@ int main() {
 
     gpio_put(LED_PIN, 0);
 
-    stdio_init_all(); // FIXME: INITIALIZE STDIO FIRST?
-
     // Baud rate debugging
     volatile uint target_baud = TARGET_BAUD;
     volatile uint actual_baud = uart_set_baudrate(uart0, TARGET_BAUD);
 
     telemetry_init();
     guidance_init();
-
-    const uint32_t start_command = 0xDEADBEEF;
-
-    uint32_t shift_in = 0;
-    while (shift_in != start_command) {
-        volatile int eof = EOF;
-        volatile int incoming = getchar();
-
-        if (incoming != EOF) {
-            shift_in = shift_in << 8 | (incoming & 0xFF);
-        }
-        // shift_in <<= incoming & 0xFF;
-    }
 
     multicore_launch_core1(guidance_main);
     telemetry_register_poll_callback(poll_voltages);

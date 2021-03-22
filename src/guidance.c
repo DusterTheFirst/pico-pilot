@@ -19,10 +19,25 @@ void guidance_init() {
 }
 
 void guidance_main() {
+    // Await User Input
+    const uint32_t start_command = 0xDEADBEEF;
+
+    uint32_t shift_in = 0;
+    while (shift_in != start_command) {
+        volatile int eof = EOF;
+        volatile int incoming = getchar();
+
+        if (incoming != EOF) {
+            shift_in = shift_in << 8 | (incoming & 0xFF);
+        }
+
+        putchar(incoming);
+    }
+
     // Calibration
     const double calibration_moves[6][2] = {
         {-5.0, 0.0},
-        {-5.0, 0.0},
+        {5.0, 0.0},
         {0.0, 0.0},
         {0.0, -5.0},
         {0.0, 5.0},
@@ -35,21 +50,28 @@ void guidance_main() {
         sleep_ms(300);
     }
 
+    tvc_put(&tvc, 0.0, 0.0);
+    sleep_ms(1000);
+
     puts("Sweeping X axis");
 
     for (double x = -5.0; x < 5.0; x += 0.5) {
         tvc_put(&tvc, x, 0.0);
-        sleep_ms(50);
+        sleep_ms(40);
     }
+
+    tvc_put(&tvc, 0.0, 0.0);
+    sleep_ms(1000);
 
     puts("Sweeping Z axis");
 
     for (double z = -5.0; z < 5.0; z += 0.5) {
         tvc_put(&tvc, 0.0, z);
-        sleep_ms(50);
+        sleep_ms(40);
     }
 
     tvc_put(&tvc, 0.0, 0.0);
+    sleep_ms(1000);
 
     double sin, cos;
     for (int i = 0; i < 100; i++)
@@ -59,7 +81,7 @@ void guidance_main() {
             tvc_put(&tvc, sin * 5.0, cos * 5.0);
             telemetry_push_tvc_angle_request(angle);
 
-            sleep_ms(50);
+            sleep_ms(20);
         }
 
     tvc_put(&tvc, 0.0, 0.0);

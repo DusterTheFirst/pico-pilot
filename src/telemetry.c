@@ -14,6 +14,7 @@
 // TODO: ADD DYNAMIC LOG FREQ
 // The logging frequency, in hertz
 const logging_frequency_t LOGGING_FREQ = LOGGING_NORMAL;
+const uint64_t LOGGING_PERIOD = 1000000 / LOGGING_FREQ;
 
 queue_t telemetry_queue;
 
@@ -51,13 +52,13 @@ void telemetry_main() {
             }
         }
 
-        bool time_is_passed = absolute_time_diff_us(next_telemetry_push,
-                                                    get_absolute_time()) <= 0;
+        int64_t time_diff = absolute_time_diff_us(get_absolute_time(),
+                                                  next_telemetry_push);
 
-        if (is_nil_time(next_telemetry_push) || time_is_passed) { // FIXME: NOT LIMITING SPEED!!!!
+        if (is_nil_time(next_telemetry_push) || time_diff <= 0) {
+            next_telemetry_push = make_timeout_time_us(LOGGING_PERIOD);
+
             telemetry_push();
-
-            next_telemetry_push = make_timeout_time_ms(1000000 / LOGGING_FREQ);
         }
     }
 }
