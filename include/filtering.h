@@ -10,7 +10,6 @@ typedef struct {
     double alpha;
 } exp_rolling_avg_t;
 
-
 /// \param alpha You can choose a value for α ranging between 0 and 1.
 /// At 0, the output is just the raw input: no filtering occurs. The output will
 /// respond instantly both to noise and to true changes in the system. At 1, the
@@ -28,11 +27,14 @@ static inline exp_rolling_avg_t exp_rolling_avg_init(double alpha) {
         .alpha = alpha});
 }
 
-static inline void exp_rolling_avg_push(exp_rolling_avg_t *self, double value) {
+static inline double exp_rolling_avg_push(exp_rolling_avg_t *self,
+                                          double value) {
     if (self->initialized) {
         self->value = value + (self->alpha * (self->value - value));
     } else {
         self->value = value;
         self->initialized = true;
     }
+
+    return self->value;
 }

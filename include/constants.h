@@ -8,7 +8,15 @@
 // V_out * V_fac = V
 #define voltage_divider_factor(r1, r2) ((double)(r1 + r2) / (double)r2)
 
+/// The onboard LED of the pico
 static const uint LED_PIN = 25;
+
+/// A GPIO tied, with a voltage divider, to the v_bus to detect its presence
+static const uint V_BUS_MONITOR_PIN = 24;
+
+/// A GPIO tied to the PS (Power Save) pin on the internal SMPS to switch
+/// between PFM (Low Power, 0) and PWM (High Power, 1) modes.
+static const uint PSU_PS_PIN = 23;
 
 // const uint SERVO_POWER_EN_PIN = 16; TODO: REMOVE
 static const uint TVC_X_AXIS_PWM = 21;

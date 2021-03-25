@@ -40,6 +40,7 @@ typedef struct {
     double temperature;
     double system_voltage;
     double battery_voltage;
+    uint16_t offset;
 } polled_telemetry_data_t;
 
 extern queue_t telemetry_queue;

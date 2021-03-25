@@ -66,14 +66,15 @@ void telemetry_main() {
 static bool telemetry_push() {
     polled_telemetry_data_t polled = telemetry_poll_callback();
 
-    printf("TELEM: %f,%f,%f,%f,%f,%f,%f\n",
+    printf("TELEM: %f,%f,%f,%f,%f,%f,%f,%u\n",
            (double)to_us_since_boot(get_absolute_time()) / 1000000,
            cache.tvc_x,
            cache.tvc_z,
            cache.angle,
            polled.temperature,
            polled.system_voltage,
-           polled.battery_voltage);
+           polled.battery_voltage,
+           polled.offset);
 
     return true;
 }

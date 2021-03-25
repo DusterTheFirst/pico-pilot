@@ -2,6 +2,7 @@
 
 #include "guidance.h"
 #include "constants.h"
+#include "pico/binary_info.h"
 #include "pico/double.h"
 #include "telemetry.h"
 #include "tvc.h"
@@ -14,6 +15,10 @@ tvc_servo_pair tvc;
 
 void guidance_init() {
     tvc = init_tvc(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM);
+
+    bi_decl(bi_2pins_with_names(TVC_X_AXIS_PWM, "TVC X-Axis",
+                                TVC_Z_AXIS_PWM, "TVC Z-Axis"));
+    bi_decl(bi_2pins_with_func(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM, GPIO_FUNC_PWM));
 
     puts("Initial guidance state setup.");
 }
