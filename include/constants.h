@@ -23,8 +23,7 @@ static const uint TVC_Z_AXIS_PWM = 20;
 
 static const uint V_SYS_ADC_PIN = 29;
 static const uint V_BAT_ADC_PIN = 28;
-static const uint GND_REF_ADC_PIN = 27; // FIXME: make sure nothing is connected
-// static const uint V_3V3_ADC_PIN = 26; // FIXME: useless?
+static const uint GND_REF_ADC_PIN = 27;
 
 static const double V_BAT_CONV_FACTOR = voltage_divider_factor(220000, 100000);
 

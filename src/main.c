@@ -27,9 +27,6 @@ typedef struct {
     exp_rolling_avg_t v_sys;
     // Battery voltage
     exp_rolling_avg_t v_bat;
-    // // Raw ADC value corresponding to
-    // exp_rolling_avg_t v_3v3; // TODO: ?
-
     // ADC reading that corresponds with ground
     exp_rolling_avg_t ground_offset;
 } t_sample_averages;
@@ -46,9 +43,6 @@ void __attribute__((constructor)) init_averages() {
 
 polled_telemetry_data_t poll_voltages() {
     const double conversion_factor = 3.3 / (1 << 12);
-
-    // // ADC 0// TODO: ?
-    // double filtered_3V3_offset = exp_rolling_avg_push(&gr);
 
     // ADC 1
     double filtered_ground_offset =
@@ -97,15 +91,8 @@ int main() {
     bi_decl(bi_1pin_with_name(V_BAT_ADC_PIN, "ADC, Battery Voltage"));
     bi_decl(bi_1pin_with_func(V_BAT_ADC_PIN, GPIO_FUNC_NULL));
 
-    // adc_gpio_init(V_3V3_ADC_PIN); // TODO: useless?
-    // gpio_pull_up(V_3V3_ADC_PIN);
-    // bi_decl(bi_1pin_with_name(V_BAT_ADC_PIN,
-    //                           "ADC, Internal (NC) 3V3 Bus Voltage"));
-    // bi_decl(bi_1pin_with_func(V_BAT_ADC_PIN, GPIO_FUNC_NULL));
-
     adc_gpio_init(GND_REF_ADC_PIN);
-    bi_decl(bi_1pin_with_name(GND_REF_ADC_PIN,
-                              "ADC, Internal (NC) Ground Reference"));
+    bi_decl(bi_1pin_with_name(GND_REF_ADC_PIN, "ADC, Ground Reference"));
     bi_decl(bi_1pin_with_func(GND_REF_ADC_PIN, GPIO_FUNC_NULL));
 
     adc_set_temp_sensor_enabled(true);
