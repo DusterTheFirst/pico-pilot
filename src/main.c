@@ -20,54 +20,66 @@
 bi_decl(bi_program_description(
     "Avionics system based on the Raspberry Pi Pico/RP2040 platform "));
 
-exp_rolling_avg_t temperature_average;
-exp_rolling_avg_t system_voltage_average;
-exp_rolling_avg_t battery_voltage_average;
-exp_rolling_avg_t ground_offset_average;
+typedef struct {
+    // Sampled temperature from the onboard temperature sensor
+    exp_rolling_avg_t temperature;
+    // System voltage
+    exp_rolling_avg_t v_sys;
+    // Battery voltage
+    exp_rolling_avg_t v_bat;
+    // // Raw ADC value corresponding to
+    // exp_rolling_avg_t v_3v3; // TODO: ?
+
+    // ADC reading that corresponds with ground
+    exp_rolling_avg_t ground_offset;
+} t_sample_averages;
+
+t_sample_averages averages;
 
 void __attribute__((constructor)) init_averages() {
-    temperature_average = exp_rolling_avg_init(.9);
-    system_voltage_average = exp_rolling_avg_init(.8);
-    battery_voltage_average = exp_rolling_avg_init(.8);
-    ground_offset_average = exp_rolling_avg_init(.8);
+    averages = (t_sample_averages){
+        .temperature = exp_rolling_avg_init(.9),
+        .v_sys = exp_rolling_avg_init(0.85),
+        .v_bat = exp_rolling_avg_init(0.85),
+        .ground_offset = exp_rolling_avg_init(0.99)};
 }
 
 polled_telemetry_data_t poll_voltages() {
     const double conversion_factor = 3.3 / (1 << 12);
 
+    // // ADC 0// TODO: ?
+    // double filtered_3V3_offset = exp_rolling_avg_push(&gr);
+
     // ADC 1
-    double filtered_ground_offset = exp_rolling_avg_push(&ground_offset_average,
-                                                         adc_read());
-    // FIXME: ALSO SAMPLE ADC V_REF?
+    double filtered_ground_offset =
+        exp_rolling_avg_push(&averages.ground_offset, adc_read());
+
+#define sample_adc_voltage() \
+    (((double)adc_read() - filtered_ground_offset) * conversion_factor)
 
     // ADC 2
-    double raw_battery_voltage = ((double)adc_read() - filtered_ground_offset) *
-                                 conversion_factor;
-    double filtered_battery_voltage = exp_rolling_avg_push(
-        &battery_voltage_average,
-        raw_battery_voltage * V_BAT_CONV_FACTOR);
+    double raw_v_bat = sample_adc_voltage();
+
+    double filtered_v_bat =
+        exp_rolling_avg_push(&averages.v_bat, raw_v_bat * V_BAT_CONV_FACTOR);
 
     // ADC 3
-    double raw_system_voltage = ((double)adc_read() - filtered_ground_offset) *
-                                conversion_factor;
+    double raw_v_sys = sample_adc_voltage();
     // from 2.1 of pico datasheet
-    double filtered_system_voltage = exp_rolling_avg_push(
-        &system_voltage_average,
-        raw_system_voltage * 3);
+    double filtered_v_sys =
+        exp_rolling_avg_push(&averages.v_sys, raw_v_sys * 3);
 
     // ADC 4
-    double raw_temperature_voltage = ((double)adc_read() -
-                                      filtered_ground_offset) *
-                                     conversion_factor;
+    double raw_v_temp = sample_adc_voltage();
     // from 4.9.4 of rp2040 datasheet
-    double filtered_temperature = exp_rolling_avg_push(
-        &temperature_average,
-        27.0 - ((raw_temperature_voltage)-0.706) / 0.001721);
+    double filtered_temp =
+        exp_rolling_avg_push(&averages.temperature,
+                             27.0 - ((raw_v_temp)-0.706) / 0.001721);
 
     return ((polled_telemetry_data_t){
-        .temperature = filtered_temperature,
-        .system_voltage = filtered_system_voltage,
-        .battery_voltage = filtered_battery_voltage,
+        .temperature = filtered_temp,
+        .v_sys = filtered_v_sys,
+        .v_bat = filtered_v_bat,
         .offset = filtered_ground_offset});
 }
 
@@ -78,12 +90,23 @@ int main() {
                 // (better calibration? use VRef?)
 
     adc_gpio_init(V_SYS_ADC_PIN);
-    bi_decl(bi_1pin_with_name(V_SYS_ADC_PIN, "ADC, System Voltage Monitor"));
+    bi_decl(bi_1pin_with_name(V_SYS_ADC_PIN, "ADC, System Voltage"));
     bi_decl(bi_1pin_with_func(V_SYS_ADC_PIN, GPIO_FUNC_NULL));
 
     adc_gpio_init(V_BAT_ADC_PIN);
-    bi_decl(bi_1pin_with_name(V_BAT_ADC_PIN, "ADC, Battery Voltage Monitor"));
+    bi_decl(bi_1pin_with_name(V_BAT_ADC_PIN, "ADC, Battery Voltage"));
     bi_decl(bi_1pin_with_func(V_BAT_ADC_PIN, GPIO_FUNC_NULL));
+
+    // adc_gpio_init(V_3V3_ADC_PIN); // TODO: useless?
+    // gpio_pull_up(V_3V3_ADC_PIN);
+    // bi_decl(bi_1pin_with_name(V_BAT_ADC_PIN,
+    //                           "ADC, Internal (NC) 3V3 Bus Voltage"));
+    // bi_decl(bi_1pin_with_func(V_BAT_ADC_PIN, GPIO_FUNC_NULL));
+
+    adc_gpio_init(GND_REF_ADC_PIN);
+    bi_decl(bi_1pin_with_name(GND_REF_ADC_PIN,
+                              "ADC, Internal (NC) Ground Reference"));
+    bi_decl(bi_1pin_with_func(GND_REF_ADC_PIN, GPIO_FUNC_NULL));
 
     adc_set_temp_sensor_enabled(true);
 

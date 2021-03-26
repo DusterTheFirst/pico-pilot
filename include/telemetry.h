@@ -38,8 +38,8 @@ typedef struct {
 
 typedef struct {
     double temperature;
-    double system_voltage;
-    double battery_voltage;
+    double v_sys;
+    double v_bat;
     uint16_t offset;
 } polled_telemetry_data_t;
 

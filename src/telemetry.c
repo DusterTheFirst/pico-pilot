@@ -72,8 +72,8 @@ static bool telemetry_push() {
            cache.tvc_z,
            cache.angle,
            polled.temperature,
-           polled.system_voltage,
-           polled.battery_voltage,
+           polled.v_sys,
+           polled.v_bat,
            polled.offset);
 
     return true;

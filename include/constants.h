@@ -18,12 +18,13 @@ static const uint V_BUS_MONITOR_PIN = 24;
 /// between PFM (Low Power, 0) and PWM (High Power, 1) modes.
 static const uint PSU_PS_PIN = 23;
 
-// const uint SERVO_POWER_EN_PIN = 16; TODO: REMOVE
 static const uint TVC_X_AXIS_PWM = 21;
 static const uint TVC_Z_AXIS_PWM = 20;
 
 static const uint V_SYS_ADC_PIN = 29;
 static const uint V_BAT_ADC_PIN = 28;
+static const uint GND_REF_ADC_PIN = 27; // FIXME: make sure nothing is connected
+// static const uint V_3V3_ADC_PIN = 26; // FIXME: useless?
 
 static const double V_BAT_CONV_FACTOR = voltage_divider_factor(220000, 100000);
 
