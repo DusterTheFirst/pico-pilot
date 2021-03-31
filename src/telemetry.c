@@ -66,15 +66,18 @@ void telemetry_main() {
 static bool telemetry_push() {
     polled_telemetry_data_t polled = telemetry_poll_callback();
 
-    printf("TELEM: %f,%f,%f,%f,%f,%f,%f,%u\n",
-           (double)to_us_since_boot(get_absolute_time()) / 1000000,
-           cache.tvc_x,
-           cache.tvc_z,
-           cache.angle,
-           polled.temperature,
-           polled.v_sys,
-           polled.v_bat,
-           polled.offset);
+    fwrite((uint8_t[]){'b', 'r', 'u', 'h', '\n', 10, 20, 30, 40},
+           sizeof(uint8_t), 5, stdout);
+
+    // printf("%f,%f,%f,%f,%f,%f,%f,%u\n",
+    //        (double)to_us_since_boot(get_absolute_time()) / 1000000,
+    //        cache.tvc_x,
+    //        cache.tvc_z,
+    //        cache.angle,
+    //        polled.temperature,
+    //        polled.v_sys,
+    //        polled.v_bat,
+    //        polled.offset);
 
     return true;
 }

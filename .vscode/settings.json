@@ -25,7 +25,6 @@
         "**/.cargo/config": "toml",
         "*.pio": "platformio-debug.asm",
         "*.h": "c",
-        "type_traits": "c"
     },
     "cSpell.words": [
         "NOLINT"

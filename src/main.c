@@ -79,6 +79,8 @@ polled_telemetry_data_t poll_voltages() {
 
 int main() {
     stdio_init_all(); // FIXME: Serial port not open on first breakpoint
+    // stdio_set_translate_crlf(std);
+    // TODO: PICO_STDIO_ENABLE_CRLF_SUPPORT false
 
     adc_init(); // FIXME: analog readings heavily dependant on VSys
                 // (better calibration? use VRef?)
