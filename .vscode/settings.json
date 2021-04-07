@@ -24,9 +24,11 @@
         "*.sxcu": "json",
         "**/.cargo/config": "toml",
         "*.pio": "platformio-debug.asm",
-        "*.h": "c",
+        "*.h": "c"
     },
-    "cSpell.words": [
-        "NOLINT"
-    ],
+    "cSpell.words": ["NOLINT"],
+    "search.exclude": {
+        "deps/**": true,
+        "pico_sdk_import.cmake": true
+    }
 }

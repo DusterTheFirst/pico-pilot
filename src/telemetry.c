@@ -1,4 +1,5 @@
 #include "telemetry.h"
+#include "checksum.h"
 #include "constants.h"
 #include "hardware/adc.h"
 #include "hardware/clocks.h"
@@ -30,7 +31,7 @@ uint32_t values_in = 0;
 void telemetry_init() {
     queue_init(&telemetry_queue, sizeof(telemetry_command_t), 128);
 
-    puts("Initial telemetry state setup.");
+    // puts("Initial telemetry state setup."); TODO: add support to telem
 }
 
 absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(next_telemetry_push, 0);
@@ -66,8 +67,32 @@ void telemetry_main() {
 static bool telemetry_push() {
     polled_telemetry_data_t polled = telemetry_poll_callback();
 
-    fwrite((uint8_t[]){'b', 'r', 'u', 'h', '\n', 10, 20, 30, 40},
-           sizeof(uint8_t), 5, stdout);
+    // FIXME: somehow standardize this with ingest server
+    struct __attribute__((__packed__)) {
+        uint64_t running_us;
+        double tvc_x;
+        double tvc_z;
+        double angle;
+        double temperature;
+        double v_sys;
+        double v_bat;
+        uint16_t offset;
+        uint64_t __magic_number;
+    } packet = {
+        .running_us = to_us_since_boot(get_absolute_time()),
+        .tvc_x = cache.tvc_x,
+        .tvc_z = cache.tvc_z,
+        .angle = cache.angle,
+        .temperature = polled.temperature,
+        .v_sys = polled.v_sys,
+        .v_bat = polled.v_bat,
+        .offset = polled.offset,
+        .__magic_number = 0xDEADBEEFBEEFDEAD};
+
+    uint16_t checksum = crc16((uint8_t *)&packet, sizeof(packet));
+
+    fwrite(&checksum, sizeof(checksum), 1, stdout);
+    fwrite(&packet, sizeof(packet), 1, stdout);
 
     // printf("%f,%f,%f,%f,%f,%f,%f,%u\n",
     //        (double)to_us_since_boot(get_absolute_time()) / 1000000,

@@ -1,5 +1,3 @@
-#define _GNU_SOURCE
-
 #include "guidance.h"
 #include "constants.h"
 #include "pico/binary_info.h"
@@ -20,7 +18,7 @@ void guidance_init() {
                                 TVC_Z_AXIS_PWM, "TVC Z-Axis"));
     bi_decl(bi_2pins_with_func(TVC_X_AXIS_PWM, TVC_Z_AXIS_PWM, GPIO_FUNC_PWM));
 
-    puts("Initial guidance state setup.");
+    // puts("Initial guidance state setup."); TODO: add support to telem
 }
 
 void guidance_main() {
@@ -58,7 +56,7 @@ void guidance_main() {
     tvc_put(&tvc, 0.0, 0.0);
     sleep_ms(1000);
 
-    puts("Sweeping X axis");
+    // puts("Sweeping X axis");  TODO: add support to telem
 
     for (double x = -5.0; x < 5.0; x += 0.5) {
         tvc_put(&tvc, x, 0.0);
@@ -68,7 +66,7 @@ void guidance_main() {
     tvc_put(&tvc, 0.0, 0.0);
     sleep_ms(1000);
 
-    puts("Sweeping Z axis");
+    // puts("Sweeping Z axis");  TODO: add support to telem
 
     for (double z = -5.0; z < 5.0; z += 0.5) {
         tvc_put(&tvc, 0.0, z);
@@ -91,7 +89,7 @@ void guidance_main() {
 
     tvc_put(&tvc, 0.0, 0.0);
 
-    puts("Done");
+    // puts("Done");  TODO: add support to telem
 
     while (true) {
         tvc_put(&tvc, 0.0, 0.0);

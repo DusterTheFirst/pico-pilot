@@ -4,6 +4,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+// FIXME: not just generic printf, integrate with telem
+
 #define panic_assert(cond, message, ...)                        \
     if (!(cond)) {                                              \
         printf("%s:%d assertion failed: ", __FILE__, __LINE__); \
