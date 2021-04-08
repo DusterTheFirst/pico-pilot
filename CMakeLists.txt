@@ -20,7 +20,7 @@ add_executable(pico_pilot
     deps/BNO055_driver/bno055.c
 )
 
-add_compile_definitions(PICO_STDIO_ENABLE_CRLF_SUPPORT=false _GNU_SOURCE)
+add_compile_definitions(PICO_STDIO_ENABLE_CRLF_SUPPORT=0 _GNU_SOURCE)
 
 pico_wrap_function(pico_pilot panic)
 
