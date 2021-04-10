@@ -26,7 +26,10 @@
         "*.pio": "platformio-debug.asm",
         "*.h": "c"
     },
-    "cSpell.words": ["NOLINT"],
+    "cSpell.words": [
+        "NOLINT",
+        "QCBOR"
+    ],
     "search.exclude": {
         "deps/**": true,
         "pico_sdk_import.cmake": true

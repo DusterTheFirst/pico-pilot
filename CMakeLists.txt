@@ -11,12 +11,15 @@ pico_sdk_init()
 
 # Add the headers
 include_directories(include)
-include_directories(deps/**)
+include_directories(deps/BNO055_driver)
+include_directories(deps/QCBOR/inc)
 
 # Add all the files to compile
-file(GLOB SOURCES src/*.c) # replace .c with .cpp for a cpp project
+file(GLOB SOURCES src/*.c)
+file(GLOB QCBOR_SOURCES deps/QCBOR/src/*.c)
 add_executable(pico_pilot
     ${SOURCES}
+    ${QCBOR_SOURCES}
     deps/BNO055_driver/bno055.c
 )
 

@@ -6,6 +6,7 @@
 #include "hardware/dma.h"
 #include "pico/multicore.h"
 #include "pico/stdlib.h"
+#include "qcbor/qcbor.h"
 #include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,35 +65,65 @@ void telemetry_main() {
     }
 }
 
+UsefulBuf_MAKE_STACK_UB(cbor_buffer, 300);
+// static const uint64_t MAGIC_NUMBER = 0xDEADBEEFBEEFDEAD;
+
 static bool telemetry_push() {
     polled_telemetry_data_t polled = telemetry_poll_callback();
 
+    QCBOREncodeContext encode_ctx;
+
+    QCBOREncode_Init(&encode_ctx, cbor_buffer);
+
+    QCBOREncode_OpenMap(&encode_ctx);
+    QCBOREncode_AddUInt64ToMap(&encode_ctx, "running_us",
+                               to_us_since_boot(get_absolute_time()));
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "tvc_x", cache.tvc_x);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "tvc_z", cache.tvc_z);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "angle", cache.angle);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "temperature", polled.temperature);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "v_sys", polled.v_sys);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "v_bat", polled.v_bat);
+    QCBOREncode_AddUInt64ToMap(&encode_ctx, "offset", polled.offset);
+    QCBOREncode_CloseMap(&encode_ctx);
+
+    UsefulBufC encoded_cbor;
+    QCBORError encode_error;
+    encode_error = QCBOREncode_Finish(&encode_ctx, &encoded_cbor);
+
+    if (encode_error == QCBOR_SUCCESS) {
+        // fwrite(&MAGIC_NUMBER, sizeof(uint8_t), sizeof(uint64_t), stdout);
+        fwrite(encoded_cbor.ptr, sizeof(uint8_t), encoded_cbor.len, stdout);
+    } else {
+        printf("oops %u\r", encode_error); // FIXME: handle better
+    }
+
     // FIXME: somehow standardize this with ingest server
-    struct __attribute__((__packed__)) {
-        uint64_t running_us;
-        double tvc_x;
-        double tvc_z;
-        double angle;
-        double temperature;
-        double v_sys;
-        double v_bat;
-        uint16_t offset;
-        uint64_t __magic_number;
-    } packet = {
-        .running_us = to_us_since_boot(get_absolute_time()),
-        .tvc_x = cache.tvc_x,
-        .tvc_z = cache.tvc_z,
-        .angle = cache.angle,
-        .temperature = polled.temperature,
-        .v_sys = polled.v_sys,
-        .v_bat = polled.v_bat,
-        .offset = polled.offset,
-        .__magic_number = 0xDEADBEEFBEEFDEAD};
+    // struct __attribute__((__packed__)) {
+    //     uint64_t running_us;
+    //     double tvc_x;
+    //     double tvc_z;
+    //     double angle;
+    //     double temperature;
+    //     double v_sys;
+    //     double v_bat;
+    //     uint16_t offset;
+    //     uint64_t __magic_number;
+    // } packet = {
+    //     .running_us =,
+    //     .tvc_x =,
+    //     .tvc_z = cache.tvc_z,
+    //     .angle = cache.angle,
+    //     .temperature = polled.temperature,
+    //     .v_sys = polled.v_sys,
+    //     .v_bat = polled.v_bat,
+    //     .offset = polled.offset,
+    //     .__magic_number = 0xDEADBEEFBEEFDEAD};
 
-    uint16_t checksum = crc16((uint8_t *)&packet, sizeof(packet));
+    // uint16_t checksum = crc16((uint8_t *)&packet, sizeof(packet));
 
-    fwrite(&checksum, sizeof(checksum), 1, stdout);
-    fwrite(&packet, sizeof(packet), 1, stdout);
+    // fwrite(&checksum, sizeof(checksum), 1, stdout);
+    // fwrite(&packet, sizeof(packet), 1, stdout);
 
     // printf("%f,%f,%f,%f,%f,%f,%f,%u\n",
     //        (double)to_us_since_boot(get_absolute_time()) / 1000000,
