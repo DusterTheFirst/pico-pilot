@@ -92,48 +92,10 @@ static bool telemetry_push() {
     encode_error = QCBOREncode_Finish(&encode_ctx, &encoded_cbor);
 
     if (encode_error == QCBOR_SUCCESS) {
-        // fwrite(&MAGIC_NUMBER, sizeof(uint8_t), sizeof(uint64_t), stdout);
         fwrite(encoded_cbor.ptr, sizeof(uint8_t), encoded_cbor.len, stdout);
     } else {
         printf("oops %u\r", encode_error); // FIXME: handle better
     }
-
-    // FIXME: somehow standardize this with ingest server
-    // struct __attribute__((__packed__)) {
-    //     uint64_t running_us;
-    //     double tvc_x;
-    //     double tvc_z;
-    //     double angle;
-    //     double temperature;
-    //     double v_sys;
-    //     double v_bat;
-    //     uint16_t offset;
-    //     uint64_t __magic_number;
-    // } packet = {
-    //     .running_us =,
-    //     .tvc_x =,
-    //     .tvc_z = cache.tvc_z,
-    //     .angle = cache.angle,
-    //     .temperature = polled.temperature,
-    //     .v_sys = polled.v_sys,
-    //     .v_bat = polled.v_bat,
-    //     .offset = polled.offset,
-    //     .__magic_number = 0xDEADBEEFBEEFDEAD};
-
-    // uint16_t checksum = crc16((uint8_t *)&packet, sizeof(packet));
-
-    // fwrite(&checksum, sizeof(checksum), 1, stdout);
-    // fwrite(&packet, sizeof(packet), 1, stdout);
-
-    // printf("%f,%f,%f,%f,%f,%f,%f,%u\n",
-    //        (double)to_us_since_boot(get_absolute_time()) / 1000000,
-    //        cache.tvc_x,
-    //        cache.tvc_z,
-    //        cache.angle,
-    //        polled.temperature,
-    //        polled.v_sys,
-    //        polled.v_bat,
-    //        polled.offset);
 
     return true;
 }
