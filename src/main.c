@@ -74,7 +74,8 @@ polled_telemetry_data_t poll_voltages() {
         .temperature = filtered_temp,
         .v_sys = filtered_v_sys,
         .v_bat = filtered_v_bat,
-        .offset = filtered_ground_offset});
+        .offset = filtered_ground_offset,
+        .v_bus_present = gpio_get(V_BUS_MONITOR_PIN)});
 }
 
 int main() {

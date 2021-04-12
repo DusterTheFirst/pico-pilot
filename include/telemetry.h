@@ -41,6 +41,7 @@ typedef struct {
     double v_sys;
     double v_bat;
     uint16_t offset;
+    bool v_bus_present;
 } polled_telemetry_data_t;
 
 extern queue_t telemetry_queue;

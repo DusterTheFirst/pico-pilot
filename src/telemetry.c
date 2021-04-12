@@ -85,6 +85,8 @@ static bool telemetry_push() {
     QCBOREncode_AddDoubleToMap(&encode_ctx, "v_sys", polled.v_sys);
     QCBOREncode_AddDoubleToMap(&encode_ctx, "v_bat", polled.v_bat);
     QCBOREncode_AddUInt64ToMap(&encode_ctx, "offset", polled.offset);
+    QCBOREncode_AddBoolToMap(&encode_ctx, "v_bus_present",
+                             polled.v_bus_present);
     QCBOREncode_CloseMap(&encode_ctx);
 
     UsefulBufC encoded_cbor;
