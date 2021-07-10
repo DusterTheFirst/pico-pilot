@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.13)
 
 # Include the glue for the pico SDK
-include(pico_sdk_import.cmake)
+include(pico-sdk/pico_sdk_init.cmake)
 
 # Setup the project
 project(pico_pilot)
@@ -9,7 +9,7 @@ project(pico_pilot)
 # Initialize the pico SDK
 pico_sdk_init()
 
-# Add the headers
+# Add the header
 include_directories(include)
 include_directories(deps/BNO055_driver)
 include_directories(deps/QCBOR/inc)
