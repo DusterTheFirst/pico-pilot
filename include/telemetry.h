@@ -3,7 +3,7 @@
 #include "pico/util/queue.h"
 #include <stdbool.h>
 
-typedef enum {
+typedef enum LoggingFrequency {
     LOGGING_IDLE = 5,
     LOGGING_SLOW = 50,
     LOGGING_NORMAL = 100,
@@ -12,12 +12,12 @@ typedef enum {
     LOGGING_STUPID_FAST = 1000,
 } logging_frequency_t;
 
-typedef enum {
+typedef enum TelemetryCommandType {
     TVCCommand,
     TVCAngleRequest
 } telemetry_command_type_t;
 
-typedef struct {
+typedef struct TelemetryCommand {
     telemetry_command_type_t type;
     union {
         struct {

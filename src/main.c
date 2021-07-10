@@ -1,4 +1,6 @@
-#include "constants.h"
+#include "constants/adc.h"
+#include "constants/pinout.h"
+#include "constants/uart.h"
 #include "filtering.h"
 #include "guidance.h"
 #include "hardware/adc.h"
@@ -75,7 +77,7 @@ polled_telemetry_data_t poll_voltages() {
         .v_sys = filtered_v_sys,
         .v_bat = filtered_v_bat,
         .offset = filtered_ground_offset,
-        .v_bus_present = gpio_get(V_BUS_MONITOR_PIN)});
+        .v_bus_present = gpio_get(PIN_V_BUS_SENSE)});
 }
 
 int main() {
@@ -85,40 +87,45 @@ int main() {
     adc_init(); // FIXME: analog readings heavily dependant on VSys
                 // (better calibration? use VRef?)
 
-    adc_gpio_init(V_SYS_ADC_PIN);
-    bi_decl(bi_1pin_with_name(V_SYS_ADC_PIN, "ADC, System Voltage"));
-    bi_decl(bi_1pin_with_func(V_SYS_ADC_PIN, GPIO_FUNC_NULL));
+    adc_gpio_init(PIN_V_SYS);
+    bi_decl(bi_1pin_with_name(PIN_V_SYS, "ADC, System Voltage"));
+    bi_decl(bi_1pin_with_func(PIN_V_SYS, GPIO_FUNC_NULL));
 
-    adc_gpio_init(V_BAT_ADC_PIN);
-    bi_decl(bi_1pin_with_name(V_BAT_ADC_PIN, "ADC, Battery Voltage"));
-    bi_decl(bi_1pin_with_func(V_BAT_ADC_PIN, GPIO_FUNC_NULL));
+    adc_gpio_init(PIN_V_BAT);
+    bi_decl(bi_1pin_with_name(PIN_V_BAT, "ADC, Battery Voltage"));
+    bi_decl(bi_1pin_with_func(PIN_V_BAT, GPIO_FUNC_NULL));
 
-    adc_gpio_init(GND_REF_ADC_PIN);
-    bi_decl(bi_1pin_with_name(GND_REF_ADC_PIN, "ADC, Ground Reference"));
-    bi_decl(bi_1pin_with_func(GND_REF_ADC_PIN, GPIO_FUNC_NULL));
+    adc_gpio_init(PIN_GND_REF);
+    bi_decl(bi_1pin_with_name(PIN_GND_REF, "ADC, Ground Reference"));
+    bi_decl(bi_1pin_with_func(PIN_GND_REF, GPIO_FUNC_NULL));
 
     adc_set_temp_sensor_enabled(true);
 
-    adc_select_input(1);
-    adc_set_round_robin(0b11110);
+    adc_select_input(ADC_GND_REF);
 
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
-    gpio_put(LED_PIN, 0);
-    bi_decl(bi_1pin_with_name(LED_PIN, "On-board LED"));
-    bi_decl(bi_1pin_with_func(LED_PIN, GPIO_FUNC_NULL));
+    // 0b11110
+    adc_set_round_robin((1 << ADC_TEMP) |
+                        (1 << ADC_V_SYS) |
+                        (1 << ADC_V_BAT) |
+                        (1 << ADC_GND_REF));
 
-    gpio_init(V_BUS_MONITOR_PIN);
-    gpio_set_dir(V_BUS_MONITOR_PIN, GPIO_IN);
-    gpio_put(V_BUS_MONITOR_PIN, 0);
-    bi_decl(bi_1pin_with_name(V_BUS_MONITOR_PIN, "VBus Monitoring Pin"));
-    bi_decl(bi_1pin_with_func(V_BUS_MONITOR_PIN, GPIO_FUNC_NULL));
+    gpio_init(PIN_LED);
+    gpio_set_dir(PIN_LED, GPIO_OUT);
+    gpio_put(PIN_LED, 0);
+    bi_decl(bi_1pin_with_name(PIN_LED, "On-board LED"));
+    bi_decl(bi_1pin_with_func(PIN_LED, GPIO_FUNC_NULL));
 
-    gpio_init(PSU_PS_PIN);
-    gpio_set_dir(PSU_PS_PIN, GPIO_OUT);
-    gpio_put(PSU_PS_PIN, 1); // Disable the power save mode
-    bi_decl(bi_1pin_with_name(PSU_PS_PIN, "SMPS Power Save Control"));
-    bi_decl(bi_1pin_with_func(PSU_PS_PIN, GPIO_FUNC_NULL));
+    gpio_init(PIN_V_BUS_SENSE);
+    gpio_set_dir(PIN_V_BUS_SENSE, GPIO_IN);
+    gpio_put(PIN_V_BUS_SENSE, 0);
+    bi_decl(bi_1pin_with_name(PIN_V_BUS_SENSE, "VBus Sense Pin"));
+    bi_decl(bi_1pin_with_func(PIN_V_BUS_SENSE, GPIO_FUNC_NULL));
+
+    gpio_init(PIN_PSU_PS);
+    gpio_set_dir(PIN_PSU_PS, GPIO_OUT);
+    gpio_put(PIN_PSU_PS, 1); // Disable the power save mode FIXME:?
+    bi_decl(bi_1pin_with_name(PIN_PSU_PS, "SMPS Power Save Control"));
+    bi_decl(bi_1pin_with_func(PIN_PSU_PS, GPIO_FUNC_NULL));
 
     // Baud rate debugging
     volatile uint target_baud = TARGET_BAUD;

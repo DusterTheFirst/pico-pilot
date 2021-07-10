@@ -1,6 +1,6 @@
 #include "telemetry.h"
 #include "checksum.h"
-#include "constants.h"
+#include "constants/pinout.h"
 #include "hardware/adc.h"
 #include "hardware/clocks.h"
 #include "hardware/dma.h"
@@ -40,7 +40,7 @@ absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(next_telemetry_push, 0);
 void telemetry_main() {
     telemetry_command_t command;
     while (true) {
-        gpio_xor_mask(1 << LED_PIN);
+        gpio_xor_mask(1 << PIN_LED);
 
         while (queue_try_remove(&telemetry_queue, &command)) {
             switch (command.type) {

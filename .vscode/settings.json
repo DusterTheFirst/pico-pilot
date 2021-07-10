@@ -21,15 +21,12 @@
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
-        "*.sxcu": "json",
-        "**/.cargo/config": "toml",
         "*.pio": "platformio-debug.asm",
         "*.h": "c"
     },
     "cSpell.words": ["NOLINT", "QCBOR"],
     "search.exclude": {
         "deps/**": true,
-        "pico_sdk_import.cmake": true
     },
     "git.detectSubmodulesLimit": 0,
     "git.detectSubmodules": false
