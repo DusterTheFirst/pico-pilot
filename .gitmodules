@@ -1,9 +1,9 @@
-[submodule "deps/BNO055_driver"]
+[submodule "BNO055_driver"]
 	path = deps/BNO055_driver
 	url = https://github.com/BoschSensortec/BNO055_driver
-[submodule "deps/QCBOR"]
+[submodule "QCBOR"]
 	path = deps/QCBOR
 	url = https://github.com/laurencelundblade/QCBOR
 [submodule "pico-sdk"]
-	path = pico-sdk
+	path = deps/pico-sdk
 	url = https://github.com/raspberrypi/pico-sdk
