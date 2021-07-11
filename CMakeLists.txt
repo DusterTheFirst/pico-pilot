@@ -16,13 +16,18 @@ include_directories(deps/QCBOR/inc)
 
 # Setup pinout header generation
 set(PICO_REF u4)
+set(NETLIST_FILE deps/pico-avionics.net)
 set(PINOUT_FILE include/constants/pinout.h)
 
 # https://stackoverflow.com/a/9842046
 set_source_files_properties(${PINOUT_FILE} PROPERTIES GENERATED true)
-add_custom_command(OUTPUT include/constants/pinout.h
-    COMMAND pinout ../pico-avionics/pico-avionics.net --ref ${PICO_REF} --lang c -o ${PINOUT_FILE}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+# Generate the pinout header file
+add_custom_command(OUTPUT ${PINOUT_FILE}
+    COMMAND pinout ARGS ${NETLIST_FILE} --ref ${PICO_REF} --lang c -o ${PINOUT_FILE}
+    DEPENDS ${NETLIST_FILE}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Creating ${PINOUT_FILE} with pinout")
 
 # Add all the files to compile
 file(GLOB SOURCES src/*.c)
@@ -31,7 +36,7 @@ add_executable(pico_pilot
     ${SOURCES}
     ${QCBOR_SOURCES}
     deps/BNO055_driver/bno055.c
-    include/constants/pinout.h
+    ${PINOUT_FILE}
 )
 
 add_compile_definitions(
