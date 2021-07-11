@@ -16,8 +16,8 @@ include_directories(deps/QCBOR/inc)
 
 # Setup pinout header generation
 set(PICO_REF u4)
-set(NETLIST_FILE deps/pico-avionics.net)
-set(PINOUT_FILE include/constants/pinout.h)
+set(NETLIST_FILE ${CMAKE_SOURCE_DIR}/deps/pico-avionics.net)
+set(PINOUT_FILE ${CMAKE_SOURCE_DIR}/include/constants/pinout.h)
 
 # https://stackoverflow.com/a/9842046
 set_source_files_properties(${PINOUT_FILE} PROPERTIES GENERATED true)
