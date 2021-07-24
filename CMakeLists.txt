@@ -53,11 +53,24 @@ pico_enable_stdio_uart(pico_pilot 0) # UART Output
 # Build the .uf2 and other files
 pico_add_extra_outputs(pico_pilot)
 
+# Build the pioasm files
+pico_generate_pio_header(pico_pilot ${CMAKE_SOURCE_DIR}/src/tone.pio)
+
+add_compile_options(
+    -Wall
+    -Wno-format        
+    -Wno-unused-function 
+    -Wno-maybe-uninitialized
+)
+
 # Link with the pico SDK
 target_link_libraries(pico_pilot
     pico_stdlib
     hardware_pwm
     hardware_adc
     hardware_dma
+    hardware_i2c
+    hardware_spi
+    hardware_pio
     pico_multicore
 )

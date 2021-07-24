@@ -11,7 +11,9 @@
 #include "pico/double.h"
 #include "pico/multicore.h"
 #include "pico/stdlib.h"
+#include "pins.h"
 #include "telemetry.h"
+#include "tone.h"
 #include "tvc.h"
 #include <math.h>
 #include <stdio.h>
@@ -82,60 +84,51 @@ polled_telemetry_data_t poll_voltages() {
 
 int main() {
     stdio_init_all(); // FIXME: Serial port not open on first breakpoint
-    // stdio_set_translate_crlf(std);
+                      // stdio_set_translate_crlf(std);
+
+    uart_set_baudrate(uart0, TARGET_BAUD);
 
     adc_init(); // FIXME: analog readings heavily dependant on VSys
-                // (better calibration? use VRef?)
+    // (better calibration? use VRef?)
 
-    adc_gpio_init(PIN_V_SYS);
-    bi_decl(bi_1pin_with_name(PIN_V_SYS, "ADC, System Voltage"));
-    bi_decl(bi_1pin_with_func(PIN_V_SYS, GPIO_FUNC_NULL));
+    init_gpio_pins();
+    init_adc_pins();
 
-    adc_gpio_init(PIN_V_BAT);
-    bi_decl(bi_1pin_with_name(PIN_V_BAT, "ADC, Battery Voltage"));
-    bi_decl(bi_1pin_with_func(PIN_V_BAT, GPIO_FUNC_NULL));
+    tone_t tone = create_tone_generator(PIN_PWM_BUZZER);
 
-    adc_gpio_init(PIN_GND_REF);
-    bi_decl(bi_1pin_with_name(PIN_GND_REF, "ADC, Ground Reference"));
-    bi_decl(bi_1pin_with_func(PIN_GND_REF, GPIO_FUNC_NULL));
+    int first[] = {293, 262, 247, 233};
 
-    adc_set_temp_sensor_enabled(true);
+    while (true) {
+        for (int i = 0; i < sizeof(first) / sizeof(first[0]); i++) {
+            start_tone(&tone, first[i], 150);
+            sleep_ms(200);
+            start_tone(&tone, first[i], 0);
+            sleep_ms(200);
+            start_tone(&tone, 587, 200);
+            sleep_ms(400);
+            start_tone(&tone, 440, 400);
+            sleep_ms(600);
+            start_tone(&tone, 415, 200);
+            sleep_ms(400);
+            start_tone(&tone, 392, 200);
+            sleep_ms(400);
+            start_tone(&tone, 349, 0);
+            sleep_ms(400);
+            start_tone(&tone, 293, 0);
+            sleep_ms(200);
+            start_tone(&tone, 349, 0);
+            sleep_ms(200);
+            start_tone(&tone, 392, 0);
+            sleep_ms(200);
+            stop_tone(&tone);
+        }
+    }
 
-    adc_select_input(ADC_GND_REF);
+    // telemetry_init();
+    // guidance_init();
 
-    // 0b11110
-    adc_set_round_robin((1 << ADC_TEMP) |
-                        (1 << ADC_V_SYS) |
-                        (1 << ADC_V_BAT) |
-                        (1 << ADC_GND_REF));
+    // multicore_launch_core1(guidance_main);
+    // telemetry_register_poll_callback(poll_voltages);
 
-    gpio_init(PIN_LED);
-    gpio_set_dir(PIN_LED, GPIO_OUT);
-    gpio_put(PIN_LED, 0);
-    bi_decl(bi_1pin_with_name(PIN_LED, "On-board LED"));
-    bi_decl(bi_1pin_with_func(PIN_LED, GPIO_FUNC_NULL));
-
-    gpio_init(PIN_V_BUS_SENSE);
-    gpio_set_dir(PIN_V_BUS_SENSE, GPIO_IN);
-    gpio_put(PIN_V_BUS_SENSE, 0);
-    bi_decl(bi_1pin_with_name(PIN_V_BUS_SENSE, "VBus Sense Pin"));
-    bi_decl(bi_1pin_with_func(PIN_V_BUS_SENSE, GPIO_FUNC_NULL));
-
-    gpio_init(PIN_PSU_PS);
-    gpio_set_dir(PIN_PSU_PS, GPIO_OUT);
-    gpio_put(PIN_PSU_PS, 1); // Disable the power save mode FIXME:?
-    bi_decl(bi_1pin_with_name(PIN_PSU_PS, "SMPS Power Save Control"));
-    bi_decl(bi_1pin_with_func(PIN_PSU_PS, GPIO_FUNC_NULL));
-
-    // Baud rate debugging
-    volatile uint target_baud = TARGET_BAUD;
-    volatile uint actual_baud = uart_set_baudrate(uart0, TARGET_BAUD);
-
-    telemetry_init();
-    guidance_init();
-
-    multicore_launch_core1(guidance_main);
-    telemetry_register_poll_callback(poll_voltages);
-
-    telemetry_main();
+    // telemetry_main();
 }
