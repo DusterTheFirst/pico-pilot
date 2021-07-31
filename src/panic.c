@@ -1,32 +1,36 @@
-// #include "constants.h"
-// #include "pico/stdlib.h"
-// #include <stdarg.h>
-// #include <stdio.h>
+#include "constants/pinout.h"
+#include "globals.h"
+#include "pico/stdlib.h"
+#include <stdarg.h>
+#include <stdio.h>
 
-// TODO: FIXME: https://github.com/raspberrypi/pico-sdk/issues/256
+__attribute__((noreturn))
+__printflike(1, 0) void pico_panic(const char *fmt, ...) {
+    // TODO: ENTER SAFE STATE
 
-// void __attribute__((noreturn)) __printflike(1, 0) __wrap_panic(const char *fmt,
-//                                                                ...) {
-//     puts("\n*** PANIC ***\n");
-//     if (fmt) {
-//         va_list args;
-//         va_start(args, fmt);
+    while (true) {
+        puts("\n*** PANIC ***\n");
+        if (fmt) {
+            va_list args;
+            va_start(args, fmt);
 
-//         vprintf(fmt, args);
-//         va_end(args);
-//         puts("\n");
-//     }
+            vprintf(fmt, args);
+            va_end(args);
+            puts("\n");
+        }
 
-//     __real_panic(":D");
+        bool tone_avaliable = tonegen.pin != NULL_TONEGEN.pin;
 
-//     // TODO:
-//     while (true) {
-//         for (int i = 0; i < 3; i++) {
-//             gpio_put(LED_PIN, 0);
-//             sleep_ms(200);
-//             gpio_put(LED_PIN, 1);
-//             sleep_ms(200);
-//         }
-//         sleep_ms(1000);
-//     }
-// }
+        for (int x = 0; x < 10; x++) {
+            for (int i = 4000; i > 3000; i -= 100) {
+                if (tone_avaliable) {
+                    tonegen_start(&tonegen, (double)i, 0);
+                }
+                gpio_put(PIN_LED, 0);
+                sleep_ms(50);
+                gpio_put(PIN_LED, 1);
+                sleep_ms(50);
+            }
+        }
+    }
+}

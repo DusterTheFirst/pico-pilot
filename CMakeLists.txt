@@ -42,7 +42,8 @@ add_executable(pico_pilot
 add_compile_definitions(
     PICO_STDIO_ENABLE_CRLF_SUPPORT=0
     _GNU_SOURCE
-    QCBOR_DISABLE_FLOAT_HW_USE)
+    QCBOR_DISABLE_FLOAT_HW_USE
+    PICO_PANIC_FUNCTION=pico_panic)
 
 pico_wrap_function(pico_pilot panic)
 
