@@ -49,9 +49,10 @@ void tonegen_start(tonegen_t *tone, double frequency, uint64_t duration) {
         return;
     }
 
-    double half_freq = frequency / 2.0;
+    // Get the frequency of half of the pulse, which happens twice per period
+    double double_freq = frequency * 2;
 
-    double cycles_d = (double)clock_get_hz(clk_sys) / half_freq;
+    double cycles_d = (double)clock_get_hz(clk_sys) / double_freq;
 
     // Subtract 2 for the 2 cycles used to get the data off the FIFO
     uint32_t cycles = (uint32_t)round(cycles_d) - 2;

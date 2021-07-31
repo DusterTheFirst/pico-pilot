@@ -100,54 +100,50 @@ int main() {
 
     // panic("uh oh!");
 
-    // tonegen_start(&tonegen, 493.8833, 3000);
-    // sleep_ms(3000);
-    // tonegen_start(&tonegen, 493.8833, 500);
-    // sleep_ms(500);
-    // tonegen_start(&tonegen, 440.0000, 3000);
-    // sleep_ms(3000);
-    // tonegen_start(&tonegen, 493.8833, 500);
-    // sleep_ms(500);
-    // tonegen_start(&tonegen, 415.3047, 3000);
-    // sleep_ms(3000);
-    // tonegen_start(&tonegen, 369.9944, 500);
-    // sleep_ms(500);
-    // tonegen_start(&tonegen, 329.6276, 500);
-    // sleep_ms(500);
-    // tonegen_start(&tonegen, 369.9944, 1000);
-    // sleep_ms(1000);
+    tonegen_start(&tonegen, 493.8833, 3000);
+    sleep_ms(3000);
+    tonegen_start(&tonegen, 493.8833, 500);
+    sleep_ms(500);
+    tonegen_start(&tonegen, 440.0000, 3000);
+    sleep_ms(3000);
+    tonegen_start(&tonegen, 493.8833, 500);
+    sleep_ms(500);
+    tonegen_start(&tonegen, 415.3047, 3000);
+    sleep_ms(3000);
+    tonegen_start(&tonegen, 369.9944, 500);
+    sleep_ms(500);
+    tonegen_start(&tonegen, 329.6276, 500);
+    sleep_ms(500);
+    tonegen_start(&tonegen, 369.9944, 1000);
+    sleep_ms(1000);
 
-    volatile int test = clock_get_hz(clk_sys);
-
-    tonegen_start(&tonegen, 440, 0);
-    while (true) {
-    }
+    // volatile int test = clock_get_hz(clk_sys);
 
     // int first[] = {293, 262, 247, 233};
 
     // while (true) {
     //     for (int i = 0; i < sizeof(first) / sizeof(first[0]); i++) {
-    //         start_tone(&tonegen, first[i], 150);
+    //         tonegen_start(&tonegen, first[i], 150);
     //         sleep_ms(200);
-    //         start_tone(&tonegen, first[i], 0);
+    //         tonegen_start(&tonegen, first[i], 0);
     //         sleep_ms(200);
-    //         start_tone(&tonegen, 587, 200);
+    //         tonegen_start(&tonegen, 587, 200);
     //         sleep_ms(400);
-    //         start_tone(&tonegen, 440, 400);
+    //         tonegen_start(&tonegen, 440, 400);
     //         sleep_ms(600);
-    //         start_tone(&tonegen, 415, 200);
+    //         tonegen_start(&tonegen, 415, 200);
     //         sleep_ms(400);
-    //         start_tone(&tonegen, 392, 200);
+    //         tonegen_start(&tonegen, 392, 200);
     //         sleep_ms(400);
-    //         start_tone(&tonegen, 349, 0);
+    //         tonegen_start(&tonegen, 349, 0);
     //         sleep_ms(400);
-    //         start_tone(&tonegen, 293, 0);
+    //         tonegen_start(&tonegen, 293, 0);
     //         sleep_ms(200);
-    //         start_tone(&tonegen, 349, 0);
+    //         tonegen_start(&tonegen, 349, 0);
     //         sleep_ms(200);
-    //         start_tone(&tonegen, 392, 0);
+    //         tonegen_start(&tonegen, 392, 0);
     //         sleep_ms(200);
-    //         stop_tone(&tonegen);
+    //         tonegen_stop(&tonegen);
     //     }
     // }
 
