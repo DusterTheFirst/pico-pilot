@@ -28,18 +28,19 @@
     mov x, osr               ; OSR -> X
 
 high:
-    pull noblock             ; Potentially grab new HALFCYCLECOUNT, OTW copy from backup in X
-    mov x, osr               ; OSR -> X
+.wrap_target
+    pull noblock             ; Potentially grab new HALFCYCLECOUNT. If the FIFO is empty, copy from backup in X
     mov y, osr      side 1   ; HALFCYCLECOUNT -> Y
 highloop:
     jmp y-- highloop         ; while (y--) { /* noop delay */ }
 
 low:
+    mov x, osr               ; OSR -> X. This is down here so that both high and low have 1 extra cycle of setup
     mov y, osr      side 0   ; HALFCYCLECOUNT -> Y
 lowloop:
     jmp y-- lowloop          ; while (y--) { /* noop delay */ }
 
-    jmp high                 ; GOTO high
+.wrap                        ; GOTO high
 
 % c-sdk {
 static inline void tone_program_init(PIO pio, uint sm, uint offset, uint pin) {

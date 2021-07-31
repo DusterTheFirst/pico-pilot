@@ -21,17 +21,14 @@ static int64_t _stop_tone_alarm(alarm_id_t id, void *user_data) {
 
     stop_tone(tone);
 
-    // free(tone);
-
     return 0;
 }
 
-tone_t create_tone_generator(uint8_t pin) {
+// Safety: tone must live forever
+tone_t create_tone_generator(uint8_t pin, PIO pio) {
     if (pin > 29) {
         panic("ERROR: Illegal pin in tone (%d)\n", pin);
     }
-
-    PIO pio = pio0;
 
     uint offset = pio_add_program(pio, &tone_program);
 
@@ -63,13 +60,13 @@ void start_tone(tone_t *tone, unsigned int frequency, uint64_t duration) {
         us = 5;
     }
 
-    pio_sm_put_blocking(tone->pio, tone->state_machine, us_to_pio_cycles(us));
+    // Subtract 2 for the 2 cycles used to get the data off the FIFO
+    uint32_t cycles = us_to_pio_cycles(us) - 2;
+
+    pio_sm_put_blocking(tone->pio, tone->state_machine, cycles);
     pio_sm_set_enabled(tone->pio, tone->state_machine, true);
 
     if (duration != 0) {
-        // tone_t *alarm_tone = malloc(sizeof(tone_t));
-        // *alarm_tone = *tone;
-
         alarm_id_t ret = add_alarm_in_ms(duration,
                                          _stop_tone_alarm,
                                          tone,
