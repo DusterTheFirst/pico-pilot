@@ -1,3 +1,5 @@
+#include "async/audio.h"
+#include "async/executor.h"
 #include "constants/adc.h"
 #include "constants/pinout.h"
 #include "constants/uart.h"
@@ -42,7 +44,8 @@ void __attribute__((constructor)) init_averages() {
         .temperature = exp_rolling_avg_init(.9),
         .v_sys = exp_rolling_avg_init(0.85),
         .v_bat = exp_rolling_avg_init(0.85),
-        .ground_offset = exp_rolling_avg_init(0.99)};
+        .ground_offset = exp_rolling_avg_init(0.99)
+    };
 }
 
 polled_telemetry_data_t poll_voltages() {
@@ -79,10 +82,20 @@ polled_telemetry_data_t poll_voltages() {
         .v_sys = filtered_v_sys,
         .v_bat = filtered_v_bat,
         .offset = filtered_ground_offset,
-        .v_bus_present = gpio_get(PIN_V_BUS_SENSE)});
+        .v_bus_present = gpio_get(PIN_V_BUS_SENSE),
+    });
 }
 
 tonegen_t tonegen = NULL_TONEGEN;
+
+// void test() {
+//     while (true) {
+//         queue_song(AUDIO_SONG_MEGALOVANIA);
+//         sleep_ms(6000);
+//         queue_song(AUDIO_SONG_NONE);
+//         sleep_ms(2000);
+//     }
+// }
 
 int main() {
     stdio_init_all(); // FIXME: Serial port not open on first breakpoint
@@ -91,61 +104,16 @@ int main() {
     uart_set_baudrate(uart0, TARGET_BAUD);
 
     adc_init(); // FIXME: analog readings heavily dependant on VSys
-    // (better calibration? use VRef?)
+                // (better calibration? use VRef?)
 
     init_gpio_pins();
     init_adc_pins();
 
     tonegen = tonegen_init(PIN_PWM_BUZZER, pio0);
 
-    // panic("uh oh!");
+    queue_song(AUDIO_SONG_MEGALOVANIA);
 
-    tonegen_start(&tonegen, 493.8833, 3000);
-    sleep_ms(3000);
-    tonegen_start(&tonegen, 493.8833, 500);
-    sleep_ms(500);
-    tonegen_start(&tonegen, 440.0000, 3000);
-    sleep_ms(3000);
-    tonegen_start(&tonegen, 493.8833, 500);
-    sleep_ms(500);
-    tonegen_start(&tonegen, 415.3047, 3000);
-    sleep_ms(3000);
-    tonegen_start(&tonegen, 369.9944, 500);
-    sleep_ms(500);
-    tonegen_start(&tonegen, 329.6276, 500);
-    sleep_ms(500);
-    tonegen_start(&tonegen, 369.9944, 1000);
-    sleep_ms(1000);
-
-    // volatile int test = clock_get_hz(clk_sys);
-
-    // int first[] = {293, 262, 247, 233};
-
-    // while (true) {
-    //     for (int i = 0; i < sizeof(first) / sizeof(first[0]); i++) {
-    //         tonegen_start(&tonegen, first[i], 150);
-    //         sleep_ms(200);
-    //         tonegen_start(&tonegen, first[i], 0);
-    //         sleep_ms(200);
-    //         tonegen_start(&tonegen, 587, 200);
-    //         sleep_ms(400);
-    //         tonegen_start(&tonegen, 440, 400);
-    //         sleep_ms(600);
-    //         tonegen_start(&tonegen, 415, 200);
-    //         sleep_ms(400);
-    //         tonegen_start(&tonegen, 392, 200);
-    //         sleep_ms(400);
-    //         tonegen_start(&tonegen, 349, 0);
-    //         sleep_ms(400);
-    //         tonegen_start(&tonegen, 293, 0);
-    //         sleep_ms(200);
-    //         tonegen_start(&tonegen, 349, 0);
-    //         sleep_ms(200);
-    //         tonegen_start(&tonegen, 392, 0);
-    //         sleep_ms(200);
-    //         tonegen_stop(&tonegen);
-    //     }
-    // }
+    executor_begin_polling((future_t[]){ AUDIO_FUTURE }, 1);
 
     // telemetry_init();
     // guidance_init();

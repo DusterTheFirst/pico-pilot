@@ -34,7 +34,8 @@ tonegen_t tonegen_init(uint8_t pin, PIO pio) {
         .pin = pin,
         .pio = pio,
         .state_machine = state_machine,
-        .alarm = 0});
+        .alarm = 0,
+    });
 }
 
 void tonegen_stop(tonegen_t *tone) {
@@ -43,7 +44,7 @@ void tonegen_stop(tonegen_t *tone) {
     gpio_set_dir(tone->pin, GPIO_OUT);
 }
 
-void tonegen_start(tonegen_t *tone, double frequency, uint64_t duration) {
+void tonegen_start(tonegen_t *tone, double frequency, uint32_t duration) {
     if (frequency == 0) {
         tonegen_stop(tone);
         return;

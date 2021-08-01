@@ -16,4 +16,4 @@ typedef struct ToneGenerator {
 
 tonegen_t tonegen_init(uint8_t pin, PIO pio);
 void tonegen_stop(tonegen_t *tone);
-void tonegen_start(tonegen_t *tone, double frequency, uint64_t duration);
+void tonegen_start(tonegen_t *tone, double frequency, uint32_t duration);

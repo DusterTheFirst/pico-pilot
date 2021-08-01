@@ -30,7 +30,7 @@ add_custom_command(OUTPUT ${PINOUT_FILE}
     COMMENT "Creating ${PINOUT_FILE} with pinout")
 
 # Add all the files to compile
-file(GLOB SOURCES src/*.c)
+file(GLOB SOURCES src/*.c src/*/*.c)
 file(GLOB QCBOR_SOURCES deps/QCBOR/src/*.c)
 add_executable(pico_pilot
     ${SOURCES}

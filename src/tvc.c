@@ -28,7 +28,8 @@ tvc_servo_pair init_tvc(uint x, uint z) {
     tvc_servo_pair tvc = {
         .slice = pwm_gpio_to_slice_num(x),
         .x_channel = pwm_gpio_to_channel(x),
-        .z_channel = pwm_gpio_to_channel(z)};
+        .z_channel = pwm_gpio_to_channel(z),
+    };
 
     gpio_set_function(x, GPIO_FUNC_PWM);
     gpio_set_function(z, GPIO_FUNC_PWM);
