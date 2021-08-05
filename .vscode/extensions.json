@@ -1,5 +1,10 @@
 {
     "recommendations": [
-        "ms-vscode.cmake-tools"
+        "ms-vscode.cmake-tools",
+        "mine.cpplint",
+        "jeff-hykin.better-cpp-syntax",
+        "ms-vscode.cpptools-extension-pack",
+        "cschlosser.doxdocgen",
+        "streetsidesoftware.code-spell-checker"
     ]
 }
