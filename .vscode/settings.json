@@ -25,8 +25,11 @@
         "*.c": "c"
     },
     "cSpell.words": ["FRAM", "NOLINT", "QCBOR"],
-    "git.detectSubmodulesLimit": 0,
-    "git.detectSubmodules": false,
+    "git.ignoredRepositories": [
+        "deps/QCBOR",
+        "deps/pico-sdk",
+        "deps/BNO055_driver"
+    ],
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "cpplint.excludes": ["deps/"],
     "search.exclude": {
