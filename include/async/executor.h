@@ -7,4 +7,6 @@ typedef struct Future {
     bool ready;
 } future_t;
 
-void executor_begin_polling(future_t futures[], size_t futures_count);
+typedef future_t *future_ref;
+
+void executor_begin_polling(future_ref futures[], size_t futures_count);

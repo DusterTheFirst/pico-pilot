@@ -5,19 +5,19 @@
 #include "constants/uart.h"
 #include "filtering.h"
 #include "guidance.h"
-#include "hardware/adc.h"
-#include "hardware/clocks.h"
-#include "hardware/gpio.h"
-#include "hardware/pwm.h"
-#include "pico/binary_info.h"
-#include "pico/double.h"
-#include "pico/multicore.h"
-#include "pico/stdlib.h"
 #include "pins.h"
 #include "telemetry.h"
 #include "tone.h"
 #include "tvc.h"
+#include <hardware/adc.h>
+#include <hardware/clocks.h>
+#include <hardware/gpio.h>
+#include <hardware/pwm.h>
 #include <math.h>
+#include <pico/binary_info.h>
+#include <pico/double.h>
+#include <pico/multicore.h>
+#include <pico/stdlib.h>
 #include <stdio.h>
 
 #include "banned.h"
@@ -86,8 +86,6 @@ polled_telemetry_data_t poll_voltages() {
     });
 }
 
-tonegen_t tonegen = NULL_TONEGEN;
-
 // void test() {
 //     while (true) {
 //         queue_song(AUDIO_SONG_MEGALOVANIA);
@@ -109,11 +107,10 @@ int main() {
     init_gpio_pins();
     init_adc_pins();
 
-    tonegen = tonegen_init(PIN_PWM_BUZZER, pio0);
+    future_t *audio_future = audio_system_init(PIN_PWM_BUZZER, pio0);
+    audio_queue_song(AUDIO_SONG_MEGALOVANIA);
 
-    queue_song(AUDIO_SONG_MEGALOVANIA);
-
-    executor_begin_polling((future_t[]){ AUDIO_FUTURE }, 1);
+    executor_begin_polling((future_t *[1]){ audio_future }, 1);
 
     // telemetry_init();
     // guidance_init();

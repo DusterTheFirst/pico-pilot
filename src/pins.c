@@ -1,9 +1,9 @@
 #include "constants/pinout.h"
-#include "hardware/adc.h"
-#include "hardware/i2c.h"
-#include "hardware/spi.h"
-#include "pico/binary_info.h"
-#include "pico/stdlib.h"
+#include <hardware/adc.h>
+#include <hardware/i2c.h>
+#include <hardware/spi.h>
+#include <pico/binary_info.h>
+#include <pico/stdlib.h>
 
 void init_gpio_pins() {
     // Setup onboard LED

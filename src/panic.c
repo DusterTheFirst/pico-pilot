@@ -1,6 +1,7 @@
+#include "async/audio.h"
 #include "constants/pinout.h"
-#include "globals.h"
-#include "pico/stdlib.h"
+#include "tone.h"
+#include <pico/stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -19,12 +20,12 @@ __printflike(1, 0) void pico_panic(const char *fmt, ...) {
             puts("\n");
         }
 
-        bool tone_avaliable = tonegen.pin != NULL_TONEGEN.pin;
+        bool tone_avaliable = audio_system_tonegen.pin != NULL_TONEGEN.pin;
 
         for (int x = 0; x < 10; x++) {
             for (int i = 4000; i > 3000; i -= 100) {
                 if (tone_avaliable) {
-                    tonegen_start(&tonegen, (double)i, 0);
+                    tonegen_start(&audio_system_tonegen, (double)i, 0);
                 }
                 gpio_put(PIN_LED, 0);
                 sleep_ms(50);

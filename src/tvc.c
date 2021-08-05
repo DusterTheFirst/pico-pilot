@@ -1,7 +1,7 @@
 #include "tvc.h"
-#include "hardware/pwm.h"
 #include "panic_assert.h"
 #include "telemetry.h"
+#include <hardware/pwm.h>
 #include <math.h>
 #include <stdio.h>
 

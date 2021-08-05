@@ -17,22 +17,18 @@
         },
         "launchTarget": {
             "visibility": "hidden"
-        },
+        }
     },
-    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
         "*.pio": "platformio-debug.asm",
         "*.h": "c",
-        "*.c": "c",
+        "*.c": "c"
     },
-    "cSpell.words": [
-        "FRAM",
-        "NOLINT",
-        "QCBOR"
-    ],
+    "cSpell.words": ["FRAM", "NOLINT", "QCBOR"],
     "search.exclude": {
-        "deps/**": true,
+        "deps/**": true
     },
     "git.detectSubmodulesLimit": 0,
-    "git.detectSubmodules": false
+    "git.detectSubmodules": false,
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

@@ -1,11 +1,11 @@
 #include "guidance.h"
 #include "constants/adc.h"
 #include "constants/pinout.h"
-#include "pico/binary_info.h"
-#include "pico/double.h"
 #include "telemetry.h"
 #include "tvc.h"
 #include <math.h>
+#include <pico/binary_info.h>
+#include <pico/double.h>
 #include <stdio.h>
 
 #include "banned.h"
@@ -36,12 +36,13 @@ void guidance_main() {
 
     // Calibration
     const double calibration_moves[6][2] = {
-        {-5.0, 0.0},
-        {5.0, 0.0},
-        {0.0, 0.0},
-        {0.0, -5.0},
-        {0.0, 5.0},
-        {0.0, 0.0}};
+        { -5.0, 0.0 },
+        { 5.0, 0.0 },
+        { 0.0, 0.0 },
+        { 0.0, -5.0 },
+        { 0.0, 5.0 },
+        { 0.0, 0.0 }
+    };
 
     for (int i = 0; i < sizeof(calibration_moves) / sizeof(double[2]); i++) {
         const double *move = calibration_moves[i];

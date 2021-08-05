@@ -1,13 +1,13 @@
 #include "telemetry.h"
 #include "checksum.h"
 #include "constants/pinout.h"
-#include "hardware/adc.h"
-#include "hardware/clocks.h"
-#include "hardware/dma.h"
-#include "pico/multicore.h"
-#include "pico/stdlib.h"
-#include "qcbor/qcbor.h"
+#include <hardware/adc.h>
+#include <hardware/clocks.h>
+#include <hardware/dma.h>
 #include <memory.h>
+#include <pico/multicore.h>
+#include <pico/stdlib.h>
+#include <qcbor/qcbor.h>
 #include <stdio.h>
 #include <stdlib.h>
 

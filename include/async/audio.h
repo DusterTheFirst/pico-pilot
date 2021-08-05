@@ -1,8 +1,8 @@
 #pragma once
 
 #include "executor.h"
-
-extern future_t AUDIO_FUTURE;
+#include "tone.h"
+#include <hardware/pio.h>
 
 typedef enum SongID {
     AUDIO_SONG_NONE,
@@ -23,6 +23,11 @@ typedef struct Song {
     bool loop;
 } song_t;
 
-void queue_song(song_id_t song);
+// Add a song to the audio subsystem queue.
+// Returns the ID of the song in the queue if there was one
+song_id_t audio_queue_song(song_id_t song);
+// Initialize the audio subsystem
+future_t *audio_system_init(uint8_t pin, PIO pio);
 
 extern const song_t SONG_LIBRARY[];
+extern tonegen_t audio_system_tonegen;
