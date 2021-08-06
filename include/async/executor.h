@@ -3,7 +3,7 @@
 #include "pico/stdlib.h"
 
 typedef struct Future {
-    void (*poll)();
+    void (*poll)(void);
     bool ready;
 } future_t;
 

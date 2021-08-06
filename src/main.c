@@ -42,7 +42,7 @@ typedef struct {
 
 t_sample_averages averages;
 
-void __attribute__((constructor)) init_averages() {
+void __attribute__((constructor)) init_averages(void) {
     averages = (t_sample_averages){
         .temperature = exp_rolling_avg_init(.9),
         .v_sys = exp_rolling_avg_init(0.85),
@@ -51,7 +51,7 @@ void __attribute__((constructor)) init_averages() {
     };
 }
 
-polled_telemetry_data_t poll_voltages() {
+polled_telemetry_data_t poll_voltages(void) {
     const double conversion_factor = 3.3 / (1 << 12);
 
     // ADC 1
@@ -89,7 +89,7 @@ polled_telemetry_data_t poll_voltages() {
     });
 }
 
-int main() {
+int main(void) {
     stdio_init_all(); // FIXME: Serial port not open on first breakpoint
                       // stdio_set_translate_crlf(std);
 

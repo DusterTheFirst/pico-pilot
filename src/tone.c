@@ -58,7 +58,7 @@ void tonegen_stop(tonegen_t *tone) {
 }
 
 void tonegen_start(tonegen_t *tone, double frequency, uint32_t duration) {
-    if (frequency == 0) {
+    if (frequency <= 0) {
         tonegen_stop(tone);
         return;
     }

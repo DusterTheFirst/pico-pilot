@@ -5,7 +5,7 @@
 #include <pico/binary_info.h>
 #include <pico/stdlib.h>
 
-void init_gpio_pins() {
+void init_gpio_pins(void) {
     // Setup onboard LED
     gpio_init(PIN_LED);
     gpio_put(PIN_LED, 0);
@@ -82,7 +82,7 @@ void init_gpio_pins() {
     bi_decl(bi_1pin_with_name(PIN_PARACHUTE_DEPLOY, "Parachute Deploy"));
 }
 
-void init_adc_pins() {
+void init_adc_pins(void) {
     adc_gpio_init(PIN_V_SYS);
     bi_decl(bi_1pin_with_name(PIN_V_SYS, "ADC, System Voltage"));
     bi_decl(bi_1pin_with_func(PIN_V_SYS, GPIO_FUNC_NULL));

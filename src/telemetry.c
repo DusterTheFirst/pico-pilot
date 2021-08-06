@@ -25,14 +25,14 @@ pushed_telemetry_data_t cache = {
     .tvc_z = 0.0,
     .angle = 0.0,
 };
-polled_telemetry_data_t (*telemetry_poll_callback)() = NULL;
+polled_telemetry_data_t (*telemetry_poll_callback)(void) = NULL;
 
 uint32_t values_in = 0;
 
 UsefulBuf_MAKE_STACK_UB(cbor_buffer, 300);
 // static const uint64_t MAGIC_NUMBER = 0xDEADBEEFBEEFDEAD;
 
-static bool telemetry_push() {
+static bool telemetry_push(void) {
     polled_telemetry_data_t polled = telemetry_poll_callback();
 
     QCBOREncodeContext encode_ctx;
@@ -67,7 +67,7 @@ static bool telemetry_push() {
 }
 
 
-void telemetry_init() {
+void telemetry_init(void) {
     queue_init(&telemetry_queue, sizeof(telemetry_command_t), 128);
 
     // puts("Initial telemetry state setup."); TODO: add support to telem
@@ -75,7 +75,7 @@ void telemetry_init() {
 
 absolute_time_t ABSOLUTE_TIME_INITIALIZED_VAR(next_telemetry_push, 0);
 
-void telemetry_main() {
+void telemetry_main(void) {
     telemetry_command_t command;
     while (true) {
         gpio_xor_mask(1 << PIN_LED);

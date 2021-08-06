@@ -8,7 +8,7 @@ static song_id_t next_song = AUDIO_SONG_NONE;
 
 tonegen_t audio_system_tonegen = NULL_TONEGEN;
 
-static void audio_poll();
+static void audio_poll(void);
 
 static future_t AUDIO_FUTURE = {
     .poll = audio_poll,
@@ -38,7 +38,7 @@ static int64_t _audio_ready(__attribute__((unused)) alarm_id_t id,
 
 static size_t current_note = 0;
 
-static void audio_poll() {
+static void audio_poll(void) {
     // Ensure the tone generator exists and has been initialized
     if (audio_system_tonegen.pin != NULL_TONEGEN.pin) {
         return;

@@ -12,13 +12,13 @@
 
 tvc_servo_pair tvc;
 
-void guidance_init() {
+void guidance_init(void) {
     tvc = init_tvc(PIN_PWM_SERVO_X, PIN_PWM_SERVO_Z);
 
     // puts("Initial guidance state setup."); TODO: add support to telem
 }
 
-void guidance_main() {
+void guidance_main(void) {
     // Await User Input
     const uint32_t start_command = 0xDEADBEEF;
 

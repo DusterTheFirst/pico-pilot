@@ -45,10 +45,10 @@ typedef struct {
 } polled_telemetry_data_t;
 
 extern queue_t telemetry_queue;
-extern polled_telemetry_data_t (*telemetry_poll_callback)();
+extern polled_telemetry_data_t (*telemetry_poll_callback)(void);
 
-void telemetry_init();
-void telemetry_main();
+void telemetry_init(void);
+void telemetry_main(void);
 
 static inline void telemetry_push_blocking(telemetry_command_t command) {
     queue_add_blocking(&telemetry_queue, &command);
@@ -59,7 +59,8 @@ static inline void telemetry_push_tvc_command(double x, double z) {
         .type = TVCCommand,
         .tvc_command = {
             .x = x,
-            .z = z}};
+            .z = z }
+    };
 
     telemetry_push_blocking(command);
 }
@@ -67,12 +68,13 @@ static inline void telemetry_push_tvc_command(double x, double z) {
 static inline void telemetry_push_tvc_angle_request(double angle) {
     telemetry_command_t command = {
         .type = TVCAngleRequest,
-        .tvc_angle_request = angle};
+        .tvc_angle_request = angle
+    };
 
     telemetry_push_blocking(command);
 }
 
 static inline void telemetry_register_poll_callback(
-    polled_telemetry_data_t (*callback)()) {
+    polled_telemetry_data_t (*callback)(void)) {
     telemetry_poll_callback = callback;
 }
