@@ -9,11 +9,6 @@ project(pico_pilot)
 # Initialize the pico SDK
 pico_sdk_init()
 
-# Add the header
-include_directories(include)
-include_directories(deps/BNO055_driver)
-include_directories(deps/QCBOR/inc)
-
 # Setup pinout header generation
 set(PICO_REF u4)
 set(NETLIST_FILE ${CMAKE_SOURCE_DIR}/deps/pico-avionics.net)
@@ -36,12 +31,35 @@ add_executable(pico_pilot
     ${PINOUT_FILE}
 )
 
+# Add the headers
+target_include_directories(pico_pilot PUBLIC
+    include
+)
+
 # Enable all warnings only for my code
-set_source_files_properties(${SOURCES} PROPERTIES COMPILE_OPTIONS
-    "-Wall;-Wextra;-Wconversion;-Wsign-conversion;-Werror"
-    # -Wno-format        
-    # -Wno-unused-function 
-    # -Wno-maybe-uninitialized
+target_compile_options(pico_pilot PRIVATE
+    -Werror
+    -Wall
+    -Wextra
+    -Wconversion
+    -Wsign-conversion
+    -Wnull-dereference
+    -Wuninitialized
+    -Wunused
+    -Wcast-align
+    -Wcast-qual
+    -Wfloat-equal
+    -Wmissing-format-attribute
+    -Wsign-compare
+    -Wstrict-prototypes
+    -Wno-inline
+    -Wpacked
+    -Wredundant-decls
+    -Wno-shadow
+    -Wno-missing-field-initializers
+    -Wno-missing-braces
+    -Wno-multichar
+    -Wundef
 )
 
 # QCBOR library
@@ -49,16 +67,16 @@ file(GLOB QCBOR_SOURCES deps/QCBOR/src/*.c)
 add_library(qcbor
     ${QCBOR_SOURCES}
 )
+target_include_directories(qcbor SYSTEM PUBLIC
+    deps/QCBOR/inc
+)
 
 # BNO055 Library
 add_library(bno055
     deps/BNO055_driver/bno055.c
 )
-
-# Link the libraries
-add_dependencies(pico_pilot
-    qcbor
-    bno055
+target_include_directories(bno055 SYSTEM PUBLIC
+    deps/BNO055_driver
 )
 
 add_compile_definitions(
@@ -79,6 +97,8 @@ pico_generate_pio_header(pico_pilot ${CMAKE_SOURCE_DIR}/src/tone.pio)
 
 # Link with the pico SDK
 target_link_libraries(pico_pilot
+    qcbor
+    bno055
     pico_stdlib
     hardware_pwm
     hardware_adc

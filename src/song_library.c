@@ -1,6 +1,6 @@
 #include "async/audio.h"
 
-const song_t SONG_LIBRARY[] = {
+const song_t SONG_LIBRARY[4] = {
     [AUDIO_SONG_NONE] = {
         .length = 0,
         .loop = false,
@@ -17,6 +17,7 @@ const song_t SONG_LIBRARY[] = {
         .length = 0,
         .loop = false,
         .notes = ((note_t[]){
+            0
             // TODO:
         }),
     },

@@ -23,8 +23,11 @@
 #include "banned.h"
 
 // Metadata
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 bi_decl(bi_program_description(
     "Avionics system based on the Raspberry Pi Pico/RP2040 platform "));
+#pragma GCC diagnostic pop
 
 typedef struct {
     // Sampled temperature from the onboard temperature sensor

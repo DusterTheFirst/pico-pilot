@@ -1,4 +1,4 @@
 #pragma once
 
-void guidance_init();
-void guidance_main();
+void guidance_init(void);
+void guidance_main(void);
