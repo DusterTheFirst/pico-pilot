@@ -86,15 +86,6 @@ polled_telemetry_data_t poll_voltages() {
     });
 }
 
-// void test() {
-//     while (true) {
-//         queue_song(AUDIO_SONG_MEGALOVANIA);
-//         sleep_ms(6000);
-//         queue_song(AUDIO_SONG_NONE);
-//         sleep_ms(2000);
-//     }
-// }
-
 int main() {
     stdio_init_all(); // FIXME: Serial port not open on first breakpoint
                       // stdio_set_translate_crlf(std);

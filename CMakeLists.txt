@@ -31,12 +31,34 @@ add_custom_command(OUTPUT ${PINOUT_FILE}
 
 # Add all the files to compile
 file(GLOB SOURCES src/*.c src/*/*.c)
-file(GLOB QCBOR_SOURCES deps/QCBOR/src/*.c)
 add_executable(pico_pilot
     ${SOURCES}
-    ${QCBOR_SOURCES}
-    deps/BNO055_driver/bno055.c
     ${PINOUT_FILE}
+)
+
+# Enable all warnings only for my code
+set_source_files_properties(${SOURCES} PROPERTIES COMPILE_OPTIONS
+    "-Wall;-Wextra;-Wconversion;-Wsign-conversion;-Werror"
+    # -Wno-format        
+    # -Wno-unused-function 
+    # -Wno-maybe-uninitialized
+)
+
+# QCBOR library
+file(GLOB QCBOR_SOURCES deps/QCBOR/src/*.c)
+add_library(qcbor
+    ${QCBOR_SOURCES}
+)
+
+# BNO055 Library
+add_library(bno055
+    deps/BNO055_driver/bno055.c
+)
+
+# Link the libraries
+add_dependencies(pico_pilot
+    qcbor
+    bno055
 )
 
 add_compile_definitions(
@@ -44,8 +66,6 @@ add_compile_definitions(
     _GNU_SOURCE
     QCBOR_DISABLE_FLOAT_HW_USE
     PICO_PANIC_FUNCTION=pico_panic)
-
-pico_wrap_function(pico_pilot panic)
 
 # Setup the compile time SDK options
 pico_enable_stdio_usb(pico_pilot 1)  # USB Output
@@ -56,13 +76,6 @@ pico_add_extra_outputs(pico_pilot)
 
 # Build the pioasm files
 pico_generate_pio_header(pico_pilot ${CMAKE_SOURCE_DIR}/src/tone.pio)
-
-add_compile_options(
-    -Wall
-    -Wno-format        
-    -Wno-unused-function 
-    -Wno-maybe-uninitialized
-)
 
 # Link with the pico SDK
 target_link_libraries(pico_pilot

@@ -23,4 +23,3 @@ typedef struct {
 
 tvc_servo_pair init_tvc(uint x, uint z);
 void tvc_put(tvc_servo_pair *tvc, double x, double z);
-static uint16_t degrees_to_servo_command(double deg);

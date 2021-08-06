@@ -24,8 +24,7 @@ void guidance_main() {
 
     uint32_t shift_in = 0;
     while (shift_in != start_command) {
-        volatile int eof = EOF;
-        volatile int incoming = getchar();
+        int incoming = getchar();
 
         if (incoming != EOF) {
             shift_in = shift_in << 8 | (incoming & 0xFF);
@@ -44,7 +43,7 @@ void guidance_main() {
         { 0.0, 0.0 }
     };
 
-    for (int i = 0; i < sizeof(calibration_moves) / sizeof(double[2]); i++) {
+    for (uint i = 0; i < sizeof(calibration_moves) / sizeof(double[2]); i++) {
         const double *move = calibration_moves[i];
 
         tvc_put(&tvc, move[0], move[1]);

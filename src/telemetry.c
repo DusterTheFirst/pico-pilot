@@ -22,12 +22,50 @@ queue_t telemetry_queue;
 
 pushed_telemetry_data_t cache = {
     .tvc_x = 0.0,
-    .tvc_x = 0.0,
+    .tvc_z = 0.0,
     .angle = 0.0,
 };
 polled_telemetry_data_t (*telemetry_poll_callback)() = NULL;
 
 uint32_t values_in = 0;
+
+UsefulBuf_MAKE_STACK_UB(cbor_buffer, 300);
+// static const uint64_t MAGIC_NUMBER = 0xDEADBEEFBEEFDEAD;
+
+static bool telemetry_push() {
+    polled_telemetry_data_t polled = telemetry_poll_callback();
+
+    QCBOREncodeContext encode_ctx;
+
+    QCBOREncode_Init(&encode_ctx, cbor_buffer);
+
+    QCBOREncode_OpenMap(&encode_ctx);
+    QCBOREncode_AddUInt64ToMap(&encode_ctx, "running_us",
+                               to_us_since_boot(get_absolute_time()));
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "tvc_x", cache.tvc_x);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "tvc_z", cache.tvc_z);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "angle", cache.angle);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "temperature", polled.temperature);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "v_sys", polled.v_sys);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "v_bat", polled.v_bat);
+    QCBOREncode_AddDoubleToMap(&encode_ctx, "offset", polled.offset);
+    QCBOREncode_AddBoolToMap(&encode_ctx, "v_bus_present",
+                             polled.v_bus_present);
+    QCBOREncode_CloseMap(&encode_ctx);
+
+    UsefulBufC encoded_cbor;
+    QCBORError encode_error;
+    encode_error = QCBOREncode_Finish(&encode_ctx, &encoded_cbor);
+
+    if (encode_error == QCBOR_SUCCESS) {
+        fwrite(encoded_cbor.ptr, sizeof(uint8_t), encoded_cbor.len, stdout);
+    } else {
+        printf("oops %u\r", encode_error); // FIXME: handle better
+    }
+
+    return true;
+}
+
 
 void telemetry_init() {
     queue_init(&telemetry_queue, sizeof(telemetry_command_t), 128);
@@ -63,41 +101,4 @@ void telemetry_main() {
             telemetry_push();
         }
     }
-}
-
-UsefulBuf_MAKE_STACK_UB(cbor_buffer, 300);
-// static const uint64_t MAGIC_NUMBER = 0xDEADBEEFBEEFDEAD;
-
-static bool telemetry_push() {
-    polled_telemetry_data_t polled = telemetry_poll_callback();
-
-    QCBOREncodeContext encode_ctx;
-
-    QCBOREncode_Init(&encode_ctx, cbor_buffer);
-
-    QCBOREncode_OpenMap(&encode_ctx);
-    QCBOREncode_AddUInt64ToMap(&encode_ctx, "running_us",
-                               to_us_since_boot(get_absolute_time()));
-    QCBOREncode_AddDoubleToMap(&encode_ctx, "tvc_x", cache.tvc_x);
-    QCBOREncode_AddDoubleToMap(&encode_ctx, "tvc_z", cache.tvc_z);
-    QCBOREncode_AddDoubleToMap(&encode_ctx, "angle", cache.angle);
-    QCBOREncode_AddDoubleToMap(&encode_ctx, "temperature", polled.temperature);
-    QCBOREncode_AddDoubleToMap(&encode_ctx, "v_sys", polled.v_sys);
-    QCBOREncode_AddDoubleToMap(&encode_ctx, "v_bat", polled.v_bat);
-    QCBOREncode_AddUInt64ToMap(&encode_ctx, "offset", polled.offset);
-    QCBOREncode_AddBoolToMap(&encode_ctx, "v_bus_present",
-                             polled.v_bus_present);
-    QCBOREncode_CloseMap(&encode_ctx);
-
-    UsefulBufC encoded_cbor;
-    QCBORError encode_error;
-    encode_error = QCBOREncode_Finish(&encode_ctx, &encoded_cbor);
-
-    if (encode_error == QCBOR_SUCCESS) {
-        fwrite(encoded_cbor.ptr, sizeof(uint8_t), encoded_cbor.len, stdout);
-    } else {
-        printf("oops %u\r", encode_error); // FIXME: handle better
-    }
-
-    return true;
 }

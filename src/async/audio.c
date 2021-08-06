@@ -29,7 +29,8 @@ future_t *audio_system_init(uint8_t pin, PIO pio) {
     return &AUDIO_FUTURE;
 }
 
-static int64_t _audio_ready(alarm_id_t id, void *_) {
+static int64_t _audio_ready(__attribute__((unused)) alarm_id_t id,
+                            __attribute__((unused)) void *user_data) {
     AUDIO_FUTURE.ready = true;
 
     return 0;

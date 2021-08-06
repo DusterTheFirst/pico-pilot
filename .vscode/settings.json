@@ -17,7 +17,7 @@
         },
         "launchTarget": {
             "visibility": "hidden"
-        }
+        },
     },
     "files.associations": {
         "*.pio": "platformio-debug.asm",

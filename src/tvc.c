@@ -14,6 +14,29 @@ const uint16_t CCW90 = 2200;  // 0.70ms   90* CCW
 const uint TVC_PWM_MAX = 62500;
 const uint TVC_CLKDIV = 40;
 
+static uint16_t degrees_to_servo_command(double deg) {
+    if (deg > 0) {
+        const double steps_in_pos_90_deg = (double)(CW90 - CENTER);
+        const double steps_in_pos_1_deg = steps_in_pos_90_deg / 90.0;
+
+        const int steps_in_deg = (int)(steps_in_pos_1_deg * deg);
+
+        // Cast happens last cause the good language of C promotes all ints to
+        // the native interpretation so uint16_t + uint16_t = uint32_t cause C
+        // refuses to do the smallest bit of work to downcast back to the input
+        // types, so we do that here :D
+        return (uint16_t)(steps_in_deg + CENTER);
+    } else {
+        const double steps_in_neg_90_deg = (double)(CENTER - CCW90);
+        const double steps_in_neg_1_deg = steps_in_neg_90_deg / 90.0;
+
+        const int steps_in_deg = (int)(steps_in_neg_1_deg * fabs(deg));
+
+        // See above
+        return (uint16_t)(CENTER - steps_in_deg);
+    }
+}
+
 // TODO: ADD OUT OF RANGE DETECTION TO PREVENT BREAKAGE
 /*
  * Initialize the given pins for servo TVC
@@ -71,13 +94,4 @@ void tvc_put(tvc_servo_pair *tvc, double x, double z) {
     pwm_set_chan_level(tvc->slice,
                        tvc->z_channel,
                        degrees_to_servo_command(z * Z_ARM_RATIO));
-}
-
-static uint16_t degrees_to_servo_command(double deg) {
-    if (deg > 0) {
-        return (uint16_t)(((double)(CW90 - CENTER) / 90.0) * deg) + CENTER;
-    } else {
-        return CENTER -
-               (uint16_t)(((double)(CENTER - CCW90) / 90.0) * fabs(deg));
-    }
 }

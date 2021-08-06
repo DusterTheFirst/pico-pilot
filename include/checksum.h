@@ -1,4 +1,5 @@
 #pragma once
+#pragma GCC diagnostic ignored "-Wconversion"
 
 #include "pico/stdlib.h"
 

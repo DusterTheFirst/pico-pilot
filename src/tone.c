@@ -8,7 +8,8 @@
 
 #include "tone.pio.h"
 
-static int64_t _stop_tone_alarm(alarm_id_t id, void *user_data) {
+static int64_t _stop_tone_alarm(__attribute__((unused)) alarm_id_t id,
+                                void *user_data) {
     tonegen_t *tone = (tonegen_t *)user_data;
 
     tone->alarm = 0;
@@ -19,15 +20,27 @@ static int64_t _stop_tone_alarm(alarm_id_t id, void *user_data) {
 }
 
 // Safety: tone must live 'static
+// Returns NULL_TONEGEN if no state machine
 tonegen_t tonegen_init(uint8_t pin, PIO pio) {
     if (pin > 29) {
         panic("ERROR: Illegal pin in tone (%d)\n", pin);
     }
 
+    // Get the offset of the PIO code to give to the PIO block
     uint offset = pio_add_program(pio, &tone_program);
 
-    int state_machine = pio_claim_unused_sm(pio, true);
+    // Claim an unused state machine
+    int state_machine_or_neg_1 = pio_claim_unused_sm(pio, true);
 
+    // Catch error
+    if (state_machine_or_neg_1 == -1) {
+        return NULL_TONEGEN;
+    }
+
+    // Cast to uint if state machine was avaliable
+    uint state_machine = (uint)state_machine_or_neg_1;
+
+    // Initialize the PIO program
     tone_program_init(pio, state_machine, offset, pin);
 
     return ((tonegen_t){
